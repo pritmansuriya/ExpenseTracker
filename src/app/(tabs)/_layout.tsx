@@ -8,8 +8,14 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: "#2563EB",
         tabBarInactiveTintColor: "#6B7280",
+        tabBarStyle: {
+          height: 65,
+          paddingBottom: 8,
+          paddingTop: 5,
+        },
       }}
     >
+      {/* Home */}
       <Tabs.Screen
         name="index"
         options={{
@@ -20,16 +26,29 @@ export default function TabsLayout() {
         }}
       />
 
+      {/* Transactions */}
       <Tabs.Screen
         name="transactions"
         options={{
-          title: "Add Transactions",
+          title: "Transactions",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="wallet-outline" size={size} color={color} />
+            <Ionicons name="receipt-outline" size={size} color={color} />
           ),
         }}
       />
 
+      {/* Add */}
+      <Tabs.Screen
+        name="AddTransactions"
+        options={{
+          title: "Add",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="add-circle-outline" size={size} color={color} />
+          ),
+        }}
+      />
+
+      {/* Profile */}
       <Tabs.Screen
         name="profile"
         options={{

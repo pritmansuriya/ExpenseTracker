@@ -1,238 +1,363 @@
-import { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import {
-  Alert,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
-export default function AddTransactionScreen() {
-  const [amount, setAmount] = useState("");
-  const [type, setType] = useState<"income" | "expense">("expense");
-  const [category, setCategory] = useState("");
-  const [description, setDescription] = useState("");
-  const [date, setDate] = useState("22 Sep 2026");
+const STORAGE_KEY = "transactions";
 
-  const handleAddTransaction = () => {
-    if (!amount || !category) {
-      Alert.alert("Error", "Please enter amount and category");
-      return;
+type Transaction = {
+  id: string;
+  title: string;
+  amount: number;
+  type: "income" | "expense";
+  date: string;
+  category: string;
+};
+
+type FilterType = "all" | "income" | "expense";
+
+export default function TransactionsScreen() {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [filter, setFilter] = useState<FilterType>("all");
+
+  const loadTransactions = async () => {
+    try {
+      const data = await AsyncStorage.getItem(STORAGE_KEY);
+
+      if (data) {
+        setTransactions(JSON.parse(data));
+      } else {
+        setTransactions([]);
+      }
+    } catch (error) {
+      console.log("Error loading transactions:", error);
     }
-
-    const transaction = {
-      id: Date.now().toString(),
-      amount: Number(amount),
-      type,
-      category,
-      description,
-      date,
-    };
-
-    console.log("New Transaction:", transaction);
-
-    Alert.alert("Success", "Transaction added successfully");
-
-    // Clear form
-    setAmount("");
-    setCategory("");
-    setDescription("");
-    setType("expense");
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      loadTransactions();
+    }, []),
+  );
+
+  const deleteTransaction = async (id: string) => {
+    Alert.alert(
+      "Delete Transaction",
+      "Are you sure you want to delete this transaction?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const updatedTransactions = transactions.filter(
+                (transaction) => transaction.id !== id,
+              );
+
+              await AsyncStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(updatedTransactions),
+              );
+
+              setTransactions(updatedTransactions);
+            } catch (error) {
+              console.log("Delete error:", error);
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const filteredTransactions = transactions.filter((transaction) => {
+    if (filter === "all") {
+      return true;
+    }
+
+    return transaction.type === filter;
+  });
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Add Transaction</Text>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Text style={styles.heading}>Transactions</Text>
 
-      {/* Amount */}
-      <Text style={styles.label}>Amount</Text>
+      <Text style={styles.subtitle}>Manage all your income and expenses</Text>
 
-      <View style={styles.amountContainer}>
-        <Text style={styles.currency}>₹</Text>
+      {/* Filters */}
+      <View style={styles.filterContainer}>
+        <TouchableOpacity
+          style={[styles.filterButton, filter === "all" && styles.activeFilter]}
+          onPress={() => setFilter("all")}
+        >
+          <Text
+            style={[
+              styles.filterText,
+              filter === "all" && styles.activeFilterText,
+            ]}
+          >
+            All
+          </Text>
+        </TouchableOpacity>
 
-        <TextInput
-          style={styles.amountInput}
-          placeholder="0"
-          keyboardType="numeric"
-          value={amount}
-          onChangeText={setAmount}
-        />
+        <TouchableOpacity
+          style={[
+            styles.filterButton,
+            filter === "income" && styles.activeFilter,
+          ]}
+          onPress={() => setFilter("income")}
+        >
+          <Text
+            style={[
+              styles.filterText,
+              filter === "income" && styles.activeFilterText,
+            ]}
+          >
+            Income
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.filterButton,
+            filter === "expense" && styles.activeFilter,
+          ]}
+          onPress={() => setFilter("expense")}
+        >
+          <Text
+            style={[
+              styles.filterText,
+              filter === "expense" && styles.activeFilterText,
+            ]}
+          >
+            Expense
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Type */}
-      <Text style={styles.label}>Type</Text>
+      {/* Transactions */}
+      {filteredTransactions.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyIcon}>📭</Text>
 
-      <View style={styles.typeContainer}>
-        <Pressable
-          style={[
-            styles.typeButton,
-            type === "income" && styles.selectedIncome,
-          ]}
-          onPress={() => setType("income")}
-        >
-          <View
-            style={[styles.radio, type === "income" && styles.radioSelected]}
-          />
+          <Text style={styles.emptyTitle}>No Transactions</Text>
 
-          <Text>Income</Text>
-        </Pressable>
+          <Text style={styles.emptyText}>
+            Add an income or expense to see it here.
+          </Text>
+        </View>
+      ) : (
+        filteredTransactions.map((transaction) => {
+          const isIncome = transaction.type === "income";
 
-        <Pressable
-          style={[
-            styles.typeButton,
-            type === "expense" && styles.selectedExpense,
-          ]}
-          onPress={() => setType("expense")}
-        >
-          <View
-            style={[styles.radio, type === "expense" && styles.radioSelected]}
-          />
+          return (
+            <View key={transaction.id} style={styles.transactionCard}>
+              {/* Left */}
+              <View style={styles.transactionInfo}>
+                <View style={styles.iconContainer}>
+                  <Text style={styles.icon}>{isIncome ? "💰" : "💸"}</Text>
+                </View>
 
-          <Text>Expense</Text>
-        </Pressable>
-      </View>
+                <View style={styles.details}>
+                  <Text style={styles.title}>{transaction.title}</Text>
 
-      {/* Category */}
-      <Text style={styles.label}>Category</Text>
+                  <Text style={styles.category}>{transaction.category}</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Select Category"
-        value={category}
-        onChangeText={setCategory}
-      />
+                  <Text style={styles.date}>
+                    {new Date(transaction.date).toLocaleDateString()}
+                  </Text>
+                </View>
+              </View>
 
-      {/* Description */}
-      <Text style={styles.label}>Description</Text>
+              {/* Right */}
+              <View style={styles.rightSection}>
+                <Text
+                  style={[
+                    styles.amount,
+                    {
+                      color: isIncome ? "#16A34A" : "#DC2626",
+                    },
+                  ]}
+                >
+                  {isIncome ? "+" : "-"} ₹
+                  {transaction.amount.toLocaleString("en-IN")}
+                </Text>
 
-      <TextInput
-        style={[styles.input, styles.description]}
-        placeholder="Enter description"
-        value={description}
-        onChangeText={setDescription}
-        multiline
-      />
-
-      {/* Date */}
-      <Text style={styles.label}>Date</Text>
-
-      <TextInput style={styles.input} value={date} onChangeText={setDate} />
-
-      {/* Button */}
-      <Pressable style={styles.addButton} onPress={handleAddTransaction}>
-        <Text style={styles.addButtonText}>Add Transaction</Text>
-      </Pressable>
-    </View>
+                {/* DELETE BUTTON */}
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => deleteTransaction(transaction.id)}
+                >
+                  <Text style={styles.deleteText}>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          );
+        })
+      )}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: "#F9FAFB",
   },
 
-  title: {
-    fontSize: 26,
-    fontWeight: "700",
+  content: {
+    padding: 20,
+    paddingTop: 60,
+    paddingBottom: 30,
+  },
+
+  heading: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#111827",
+  },
+
+  subtitle: {
+    fontSize: 14,
+    color: "#6B7280",
+    marginTop: 5,
     marginBottom: 25,
   },
 
-  label: {
-    fontSize: 15,
-    fontWeight: "600",
-    marginBottom: 8,
-    marginTop: 15,
-  },
-
-  amountContainer: {
+  filterContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    borderRadius: 10,
-    paddingHorizontal: 15,
+    backgroundColor: "#E5E7EB",
+    padding: 4,
+    borderRadius: 12,
+    marginBottom: 20,
   },
 
-  currency: {
-    fontSize: 20,
-    fontWeight: "600",
-  },
-
-  amountInput: {
+  filterButton: {
     flex: 1,
-    fontSize: 20,
-    padding: 14,
-  },
-
-  input: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    borderRadius: 10,
-    padding: 14,
-    fontSize: 16,
-  },
-
-  typeContainer: {
-    flexDirection: "row",
-    gap: 12,
-  },
-
-  typeButton: {
-    flex: 1,
-    flexDirection: "row",
+    paddingVertical: 10,
     alignItems: "center",
-    gap: 8,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    borderRadius: 10,
-    backgroundColor: "#FFFFFF",
-  },
-
-  selectedIncome: {
-    borderColor: "#22C55E",
-    backgroundColor: "#F0FDF4",
-  },
-
-  selectedExpense: {
-    borderColor: "#EF4444",
-    backgroundColor: "#FEF2F2",
-  },
-
-  radio: {
-    width: 18,
-    height: 18,
     borderRadius: 9,
-    borderWidth: 2,
-    borderColor: "#94A3B8",
   },
 
-  radioSelected: {
-    borderColor: "#2563EB",
+  activeFilter: {
     backgroundColor: "#2563EB",
   },
 
-  description: {
-    height: 90,
-    textAlignVertical: "top",
+  filterText: {
+    color: "#4B5563",
+    fontWeight: "600",
   },
 
-  addButton: {
-    marginTop: 30,
-    backgroundColor: "#2563EB",
-    padding: 16,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-
-  addButtonText: {
+  activeFilterText: {
     color: "#FFFFFF",
-    fontSize: 17,
-    fontWeight: "700",
+  },
+
+  transactionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#FFFFFF",
+    padding: 15,
+    borderRadius: 14,
+    marginBottom: 12,
+  },
+
+  transactionInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+
+  iconContainer: {
+    width: 45,
+    height: 45,
+    borderRadius: 23,
+    backgroundColor: "#F3F4F6",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+
+  icon: {
+    fontSize: 22,
+  },
+
+  details: {
+    flex: 1,
+  },
+
+  title: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#111827",
+  },
+
+  category: {
+    fontSize: 13,
+    color: "#6B7280",
+    marginTop: 3,
+  },
+
+  date: {
+    fontSize: 12,
+    color: "#9CA3AF",
+    marginTop: 3,
+  },
+
+  rightSection: {
+    alignItems: "flex-end",
+    marginLeft: 10,
+  },
+
+  amount: {
+    fontSize: 15,
+    fontWeight: "bold",
+  },
+
+  deleteButton: {
+    marginTop: 8,
+    backgroundColor: "#FEE2E2",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+  },
+
+  deleteText: {
+    color: "#DC2626",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+
+  emptyContainer: {
+    alignItems: "center",
+    marginTop: 80,
+  },
+
+  emptyIcon: {
+    fontSize: 50,
+    marginBottom: 15,
+  },
+
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#111827",
+  },
+
+  emptyText: {
+    fontSize: 14,
+    color: "#6B7280",
+    marginTop: 8,
+    textAlign: "center",
   },
 });
