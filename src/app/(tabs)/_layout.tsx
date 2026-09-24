@@ -37,6 +37,16 @@ export default function TabsLayout() {
         }}
       />
 
+      <Tabs.Screen
+        name="savings-goal"
+        options={{
+          title: "Savings",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="trophy-outline" size={size} color={color} />
+          ),
+        }}
+      />
+
       {/* Profile */}
       <Tabs.Screen
         name="profile"
