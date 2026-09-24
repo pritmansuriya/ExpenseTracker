@@ -37,17 +37,6 @@ export default function TabsLayout() {
         }}
       />
 
-      {/* Add */}
-      <Tabs.Screen
-        name="AddTransactions"
-        options={{
-          title: "Add",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="add-circle-outline" size={size} color={color} />
-          ),
-        }}
-      />
-
       {/* Profile */}
       <Tabs.Screen
         name="profile"

@@ -31,7 +31,7 @@ export default function HomeScreen() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
 
-  const loadTransactions = async () => {
+  const loadTransactions = useCallback(async () => {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
 
@@ -45,9 +45,9 @@ export default function HomeScreen() {
     } catch (error) {
       console.log("Error loading transactions:", error);
     }
-  };
+  }, []);
 
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const loggedIn = await AsyncStorage.getItem("loggedIn");
       const userData = await AsyncStorage.getItem("user");
@@ -63,7 +63,7 @@ export default function HomeScreen() {
     } catch (error) {
       console.log("Auth check error:", error);
     }
-  };
+  }, []);
 
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -93,33 +93,8 @@ export default function HomeScreen() {
     useCallback(() => {
       loadTransactions();
       checkAuth();
-    }, [loadTransactions]),
+    }, [loadTransactions, checkAuth]),
   );
-
-  const deleteTransaction = async (id: string) => {
-    try {
-      const data = await AsyncStorage.getItem(STORAGE_KEY);
-
-      if (!data) {
-        return;
-      }
-
-      const existingTransactions = JSON.parse(data);
-
-      const updatedTransactions = existingTransactions.filter(
-        (transaction: Transaction) => transaction.id !== id,
-      );
-
-      await AsyncStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(updatedTransactions),
-      );
-
-      setTransactions(updatedTransactions);
-    } catch (error) {
-      console.log("Error deleting transaction:", error);
-    }
-  };
 
   const income = transactions
     .filter((item) => item.type === "income")
@@ -188,11 +163,7 @@ export default function HomeScreen() {
         <Text style={styles.emptyText}>No transactions yet</Text>
       ) : (
         recentTransactions.map((transaction) => (
-          <TransactionItem
-            key={transaction.id}
-            transaction={transaction}
-            onDelete={deleteTransaction}
-          />
+          <TransactionItem key={transaction.id} transaction={transaction} />
         ))
       )}
     </ScrollView>

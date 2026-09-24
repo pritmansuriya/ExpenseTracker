@@ -1,13 +1,14 @@
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const STORAGE_KEY = "transactions";
@@ -90,9 +91,24 @@ export default function TransactionsScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.heading}>Transactions</Text>
+      {/* Header with Title on Left & Small Add Button on Right */}
+      <View style={styles.headerContainer}>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.heading}>Transactions</Text>
+          <Text style={styles.subtitle}>
+            Manage all your income and expenses
+          </Text>
+        </View>
 
-      <Text style={styles.subtitle}>Manage all your income and expenses</Text>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => router.push("/add-transactions")}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="add" size={20} color="#FFFFFF" />
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Filters */}
       <View style={styles.filterContainer}>
@@ -221,17 +237,44 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
 
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+
+  headerTextContainer: {
+    flex: 1,
+    marginRight: 12,
+  },
+
   heading: {
-    fontSize: 28,
+    fontSize: 23,
     fontWeight: "bold",
     color: "#111827",
   },
 
   subtitle: {
-    fontSize: 14,
+    fontSize: 13,
     color: "#6B7280",
-    marginTop: 5,
-    marginBottom: 25,
+    marginTop: 2,
+  },
+
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#2563EB",
+    paddingHorizontal: 15,
+    paddingVertical: 9,
+    borderRadius: 10,
+    gap: 6,
+  },
+
+  addButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
   },
 
   filterContainer: {

@@ -1,5 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
   Alert,
   Image,
@@ -10,15 +12,58 @@ import {
   Text,
   View,
 } from "react-native";
-
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const [darkMode, setDarkMode] = useState(false);
 
+  const [profile, setProfile] = useState({
+    name: "User",
+    email: "user@example.com",
+    phone: "+91 98765 43210",
+  });
+
   const handlePress = (title: string) => {
     Alert.alert(title, `${title} screen will open here.`);
   };
+
+  const loadProfile = async () => {
+    try {
+      const profileData = await AsyncStorage.getItem("profile");
+      const userData = await AsyncStorage.getItem("user");
+
+      let name = "";
+      let email = "";
+      let phone = "+91 98765 43210";
+
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        name = parsedUser.name || "";
+        email = parsedUser.email || "";
+      }
+
+      if (profileData) {
+        const parsedProfile = JSON.parse(profileData);
+        if (parsedProfile.name) name = parsedProfile.name;
+        if (parsedProfile.email) email = parsedProfile.email;
+        if (parsedProfile.phone) phone = parsedProfile.phone;
+      }
+
+      setProfile({
+        name: name || "User",
+        email: email || "user@example.com",
+        phone,
+      });
+    } catch (error) {
+      console.log("Error loading profile:", error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+    }, []),
+  );
 
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -29,8 +74,13 @@ export default function ProfileScreen() {
       {
         text: "Logout",
         style: "destructive",
-        onPress: () => {
-          console.log("User logged out");
+        onPress: async () => {
+          try {
+            await AsyncStorage.setItem("loggedIn", "false");
+            router.replace("/login");
+          } catch (error) {
+            console.log("Logout error:", error);
+          }
         },
       },
     ]);
@@ -62,13 +112,13 @@ export default function ProfileScreen() {
             </Pressable>
           </View>
 
-          <Text style={styles.name}>Prit Mansuriya</Text>
+          <Text style={styles.name}>{profile.name}</Text>
 
-          <Text style={styles.email}>prit@example.com</Text>
+          <Text style={styles.email}>{profile.email}</Text>
 
           <Pressable
             style={styles.editProfileButton}
-            onPress={() => handlePress("Edit Profile")}
+            onPress={() => router.push("/edit-profile")}
           >
             <Ionicons name="create-outline" size={17} color="#2563EB" />
 
@@ -80,31 +130,20 @@ export default function ProfileScreen() {
         <SectionTitle title="Personal Information" />
 
         <View style={styles.section}>
-          <MenuItem
-            icon="person-outline"
-            title="Name"
-            value="Prit Mansuriya"
-            onPress={() => handlePress("Name")}
-          />
+          <MenuItem icon="person-outline" title="Name" value={profile.name} />
 
-          <MenuItem
-            icon="mail-outline"
-            title="Email"
-            value="prit@example.com"
-            onPress={() => handlePress("Email")}
-          />
+          <MenuItem icon="mail-outline" title="Email" value={profile.email} />
 
           <MenuItem
             icon="call-outline"
             title="Mobile Number"
-            value="+91 98765 43210"
-            onPress={() => handlePress("Mobile Number")}
+            value={profile.phone}
           />
 
           <MenuItem
             icon="create-outline"
             title="Edit Personal Information"
-            onPress={() => handlePress("Edit Personal Information")}
+            onPress={() => router.push("/edit-profile")}
             showDivider={false}
           />
         </View>

@@ -1,38 +1,80 @@
-import { StyleSheet, Text, View } from "react-native";
-import { transaction } from "../(tabs)/transactions";
-import { COLORS } from "../constants/colors";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-type Props = {
-  transaction: transaction;
+type Transaction = {
+  id: string;
+  title: string;
+  amount: number;
+  type: "income" | "expense";
+  date: string;
+  category: string;
 };
 
-export default function TransactionItem({ transaction }: Props) {
+type Props = {
+  transaction: Transaction;
+  onDelete?: (id: string) => void;
+};
+
+export default function TransactionItem({ transaction, onDelete }: Props) {
   const isIncome = transaction.type === "income";
+
+  const handleDelete = () => {
+    if (!onDelete) {
+      return;
+    }
+
+    Alert.alert("Delete Transaction", `Delete "${transaction.title}"?`, [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => onDelete(transaction.id),
+      },
+    ]);
+  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.left}>
+      {/* Left side */}
+      <View style={styles.leftSection}>
         <View style={styles.iconContainer}>
-          <Text style={styles.icon}>{transaction.icon}</Text>
+          <Text style={styles.icon}>{isIncome ? "💰" : "💸"}</Text>
         </View>
 
-        <View>
+        <View style={styles.info}>
           <Text style={styles.title}>{transaction.title}</Text>
 
-          <Text style={styles.date}>{transaction.date}</Text>
+          <Text style={styles.category}>{transaction.category}</Text>
+
+          <Text style={styles.date}>
+            {new Date(transaction.date).toLocaleDateString()}
+          </Text>
         </View>
       </View>
 
-      <Text
-        style={[
-          styles.amount,
-          {
-            color: isIncome ? COLORS.green : COLORS.red,
-          },
-        ]}
-      >
-        {isIncome ? "+" : "-"}₹{transaction.amount.toLocaleString("en-IN")}
-      </Text>
+      {/* Right side */}
+      <View style={styles.rightSection}>
+        <Text
+          style={[
+            styles.amount,
+            {
+              color: isIncome ? "#16A34A" : "#DC2626",
+            },
+          ]}
+        >
+          {isIncome ? "+" : "-"} ₹{transaction.amount.toLocaleString("en-IN")}
+        </Text>
+
+        {/* Delete button */}
+        {/* Delete button - only shown when onDelete is provided */}
+        {onDelete && (
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+            <Text style={styles.deleteText}>Delete</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 }
@@ -40,26 +82,27 @@ export default function TransactionItem({ transaction }: Props) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: COLORS.white,
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     padding: 15,
-    marginBottom: 10,
-    borderRadius: 16,
+    borderRadius: 12,
+    marginBottom: 12,
   },
 
-  left: {
+  leftSection: {
     flexDirection: "row",
     alignItems: "center",
+    flex: 1,
   },
 
   iconContainer: {
     width: 45,
     height: 45,
-    borderRadius: 14,
-    backgroundColor: COLORS.background,
-    alignItems: "center",
+    borderRadius: 23,
+    backgroundColor: "#F3F4F6",
     justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
 
@@ -67,20 +110,46 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
 
+  info: {
+    flex: 1,
+  },
+
   title: {
     fontSize: 16,
     fontWeight: "600",
-    color: COLORS.black,
+    color: "#111827",
+  },
+
+  category: {
+    fontSize: 13,
+    color: "#6B7280",
+    marginTop: 3,
   },
 
   date: {
-    color: COLORS.gray,
     fontSize: 12,
-    marginTop: 3,
+    color: "#9CA3AF",
+    marginTop: 2,
+  },
+
+  rightSection: {
+    alignItems: "flex-end",
   },
 
   amount: {
     fontSize: 15,
     fontWeight: "bold",
+  },
+
+  deleteButton: {
+    marginTop: 7,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+
+  deleteText: {
+    color: "#DC2626",
+    fontSize: 12,
+    fontWeight: "600",
   },
 });
