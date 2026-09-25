@@ -146,6 +146,13 @@ export default function ProfileScreen() {
             onPress={() => router.push("/edit-profile")}
             showDivider={false}
           />
+
+          <MenuItem
+            icon="create-outline"
+            title="My Account"
+            onPress={() => router.push("/accounts")}
+            showDivider={false}
+          />
         </View>
 
         {/* Expense Settings */}
