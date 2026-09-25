@@ -1,3 +1,4 @@
+import { addNotification } from "@/utils/notificationStorage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -45,6 +46,16 @@ export default function AddSavingsGoal() {
       const updatedGoals = [newGoal, ...existingGoals];
 
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedGoals));
+
+      // Create notification
+      await addNotification({
+        id: Date.now().toString(),
+        title: "New Savings Goal",
+        message: `Goal "${name.trim()}" created with target ₹${numericTarget.toLocaleString("en-IN")}.`,
+        type: "saving",
+        createdAt: new Date().toISOString(),
+        read: false,
+      });
 
       Alert.alert("Success", "Savings goal created successfully");
 

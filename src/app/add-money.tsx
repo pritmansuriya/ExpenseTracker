@@ -1,13 +1,14 @@
+import { addNotification } from "@/utils/notificationStorage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    Alert,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const STORAGE_KEY = "savingsGoals";
@@ -97,6 +98,17 @@ export default function AddMoneyScreen() {
       });
 
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedGoals));
+
+      // Create notification
+      await addNotification({
+        id: Date.now().toString(),
+        title: "Savings Progress",
+        message: `Added ₹${numericAmount.toLocaleString("en-IN")} to "${goal?.name}".`,
+        amount: numericAmount,
+        type: "saving",
+        createdAt: new Date().toISOString(),
+        read: false,
+      });
 
       Alert.alert(
         "Success",

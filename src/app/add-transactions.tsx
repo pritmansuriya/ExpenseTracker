@@ -1,3 +1,4 @@
+import { addNotification } from "@/utils/notificationStorage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -53,6 +54,17 @@ export default function AddTransactions() {
         STORAGE_KEY,
         JSON.stringify(updatedTransactions),
       );
+
+      // Create notification
+      await addNotification({
+        id: Date.now().toString(),
+        title: type === "income" ? "Income Added" : "Expense Recorded",
+        message: `${title.trim()} (₹${numericAmount.toLocaleString("en-IN")}) under ${category.trim()}.`,
+        amount: numericAmount,
+        type: "transaction",
+        createdAt: new Date().toISOString(),
+        read: false,
+      });
 
       Alert.alert(
         "Success",
