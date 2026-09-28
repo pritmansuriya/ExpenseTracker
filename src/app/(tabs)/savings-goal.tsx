@@ -1,16 +1,15 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
-const STORAGE_KEY = "savingsGoals";
+import { getSavingsGoals } from "@/services/savingsApi";
 
 type SavingsGoal = {
   id: string;
@@ -26,15 +25,13 @@ export default function SavingsGoalScreen() {
   // Load goals from AsyncStorage
   const loadGoals = async () => {
     try {
-      const data = await AsyncStorage.getItem(STORAGE_KEY);
+      const response = await getSavingsGoals();
 
-      if (data) {
-        setGoals(JSON.parse(data));
-      } else {
-        setGoals([]);
-      }
+      console.log("Savings goals from API:", response);
+
+      setGoals(response);
     } catch (error) {
-      console.log("Error loading goals:", error);
+      console.log("Error loading savings goals:", error);
     }
   };
 
@@ -55,19 +52,10 @@ export default function SavingsGoalScreen() {
       {
         text: "Delete",
         style: "destructive",
-        onPress: async () => {
-          try {
-            const updatedGoals = goals.filter((goal) => goal.id !== id);
-
-            await AsyncStorage.setItem(
-              STORAGE_KEY,
-              JSON.stringify(updatedGoals),
-            );
-
-            setGoals(updatedGoals);
-          } catch (error) {
-            console.log("Delete error:", error);
-          }
+        onPress: () => {
+          setGoals((currentGoals) =>
+            currentGoals.filter((goal) => goal.id !== id),
+          );
         },
       },
     ]);

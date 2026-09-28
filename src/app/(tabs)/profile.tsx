@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
@@ -15,7 +16,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
-  const [darkMode, setDarkMode] = useState(false);
+  const { isDarkMode, toggleDarkMode } = useTheme();
 
   const [profile, setProfile] = useState({
     name: "User",
@@ -87,18 +88,38 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDarkMode ? "#111827" : "#F8FAFC",
+        },
+      ]}
+    >
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Profile</Text>
-        </View>
+        <Text
+          style={[
+            styles.headerTitle,
+            {
+              color: isDarkMode ? "#FFFFFF" : "#0F172A",
+            },
+          ]}
+        >
+          Profile
+        </Text>
 
         {/* Profile Header */}
-        <View style={styles.profileCard}>
+        <View
+          style={[
+            styles.profileCard,
+            {
+              backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+            },
+          ]}
+        >
           <View style={styles.avatarContainer}>
             <Image
               source={{
@@ -112,9 +133,27 @@ export default function ProfileScreen() {
             </Pressable>
           </View>
 
-          <Text style={styles.name}>{profile.name}</Text>
+          <Text
+            style={[
+              styles.name,
+              {
+                color: isDarkMode ? "#FFFFFF" : "#0F172A",
+              },
+            ]}
+          >
+            {profile.name}
+          </Text>
 
-          <Text style={styles.email}>{profile.email}</Text>
+          <Text
+            style={[
+              styles.email,
+              {
+                color: isDarkMode ? "#9CA3AF" : "#64748B",
+              },
+            ]}
+          >
+            {profile.email}
+          </Text>
 
           <Pressable
             style={styles.editProfileButton}
@@ -129,17 +168,14 @@ export default function ProfileScreen() {
         {/* Personal Information */}
         <SectionTitle title="Personal Information" />
 
-        <View style={styles.section}>
-          <MenuItem icon="person-outline" title="Name" value={profile.name} />
-
-          <MenuItem icon="mail-outline" title="Email" value={profile.email} />
-
-          <MenuItem
-            icon="call-outline"
-            title="Mobile Number"
-            value={profile.phone}
-          />
-
+        <View
+          style={[
+            styles.section,
+            {
+              backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+            },
+          ]}
+        >
           <MenuItem
             icon="create-outline"
             title="Edit Personal Information"
@@ -221,13 +257,13 @@ export default function ProfileScreen() {
             title="Dark Mode"
             rightComponent={
               <Switch
-                value={darkMode}
-                onValueChange={setDarkMode}
+                value={isDarkMode}
+                onValueChange={toggleDarkMode}
                 trackColor={{
                   false: "#CBD5E1",
                   true: "#93C5FD",
                 }}
-                thumbColor={darkMode ? "#2563EB" : "#F8FAFC"}
+                thumbColor={isDarkMode ? "#2563EB" : "#F8FAFC"}
               />
             }
           />
@@ -310,9 +346,21 @@ export default function ProfileScreen() {
 /* -------------------------------- */
 /* Section Title                    */
 /* -------------------------------- */
-
 function SectionTitle({ title }: { title: string }) {
-  return <Text style={styles.sectionTitle}>{title}</Text>;
+  const { isDarkMode } = useTheme();
+
+  return (
+    <Text
+      style={[
+        styles.sectionTitle,
+        {
+          color: isDarkMode ? "#D1D5DB" : "#475569",
+        },
+      ]}
+    >
+      {title}
+    </Text>
+  );
 }
 
 /* -------------------------------- */
@@ -336,6 +384,7 @@ function MenuItem({
   rightComponent,
   showDivider = true,
 }: MenuItemProps) {
+  const { isDarkMode } = useTheme();
   return (
     <Pressable style={styles.menuItem} onPress={onPress}>
       <View style={styles.menuLeft}>
@@ -344,7 +393,16 @@ function MenuItem({
         </View>
 
         <View style={styles.menuTextContainer}>
-          <Text style={styles.menuTitle}>{title}</Text>
+          <Text
+            style={[
+              styles.menuTitle,
+              {
+                color: isDarkMode ? "#FFFFFF" : "#1E293B",
+              },
+            ]}
+          >
+            {title}
+          </Text>
 
           {value && <Text style={styles.menuValue}>{value}</Text>}
         </View>

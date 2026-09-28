@@ -1,17 +1,15 @@
+import { addMoneyToGoal, getSavingsGoalById } from "@/services/savingsApi";
 import { addNotification } from "@/utils/notificationStorage";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    Alert,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-
-const STORAGE_KEY = "savingsGoals";
 
 type SavingsGoal = {
   id: string;
@@ -25,6 +23,7 @@ export default function AddMoneyScreen() {
   const { goalId } = useLocalSearchParams<{ goalId: string }>();
   const [amount, setAmount] = useState("");
   const [goal, setGoal] = useState<SavingsGoal | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadGoal();
@@ -32,13 +31,8 @@ export default function AddMoneyScreen() {
 
   const loadGoal = async () => {
     try {
-      const data = await AsyncStorage.getItem(STORAGE_KEY);
-
-      if (data) {
-        const goals: SavingsGoal[] = JSON.parse(data);
-        const found = goals.find((g) => g.id === goalId);
-        setGoal(found || null);
-      }
+      const data = await getSavingsGoalById(goalId);
+      setGoal(data);
     } catch (error) {
       console.log("Error loading goal:", error);
     }
@@ -83,21 +77,14 @@ export default function AddMoneyScreen() {
   };
 
   const saveMoney = async (numericAmount: number) => {
+    setLoading(true);
+
     try {
-      const data = await AsyncStorage.getItem(STORAGE_KEY);
-      const goals: SavingsGoal[] = data ? JSON.parse(data) : [];
+      // Call API to add money
+      const updatedGoal = await addMoneyToGoal(goalId, numericAmount);
 
-      const updatedGoals = goals.map((g) => {
-        if (g.id === goalId) {
-          return {
-            ...g,
-            savedAmount: g.savedAmount + numericAmount,
-          };
-        }
-        return g;
-      });
-
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedGoals));
+      // Update local state with response
+      setGoal(updatedGoal);
 
       // Create notification
       await addNotification({
@@ -122,7 +109,12 @@ export default function AddMoneyScreen() {
       );
     } catch (error) {
       console.log("Error saving money:", error);
-      Alert.alert("Error", "Failed to add money");
+      Alert.alert(
+        "Error",
+        "Failed to add money. Make sure the server is running.",
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -203,13 +195,19 @@ export default function AddMoneyScreen() {
           />
 
           {/* Add Button */}
-          <TouchableOpacity style={styles.button} onPress={handleAddMoney}>
-            <Text style={styles.buttonText}>Add Money to Goal</Text>
+          <TouchableOpacity
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={handleAddMoney}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>
+              {loading ? "Adding..." : "Add Money to Goal"}
+            </Text>
           </TouchableOpacity>
         </>
       ) : (
         <View style={styles.notFound}>
-          <Text style={styles.notFoundText}>Goal not found.</Text>
+          <Text style={styles.notFoundText}>Loading goal...</Text>
         </View>
       )}
     </View>
@@ -333,6 +331,10 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
+  },
+
+  buttonDisabled: {
+    backgroundColor: "#93C5FD",
   },
 
   buttonText: {

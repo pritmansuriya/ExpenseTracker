@@ -1,5 +1,5 @@
+import { addSavingsGoal } from "@/services/savingsApi";
 import { addNotification } from "@/utils/notificationStorage";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -11,11 +11,10 @@ import {
     View,
 } from "react-native";
 
-const STORAGE_KEY = "savingsGoals";
-
 export default function AddSavingsGoal() {
   const [name, setName] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleCreateGoal = async () => {
     if (!name.trim() || !targetAmount.trim()) {
@@ -30,22 +29,11 @@ export default function AddSavingsGoal() {
       return;
     }
 
-    const newGoal = {
-      id: Date.now().toString(),
-      name: name.trim(),
-      targetAmount: numericTarget,
-      savedAmount: 0,
-      createdAt: new Date().toISOString(),
-    };
+    setLoading(true);
 
     try {
-      const existingData = await AsyncStorage.getItem(STORAGE_KEY);
-
-      const existingGoals = existingData ? JSON.parse(existingData) : [];
-
-      const updatedGoals = [newGoal, ...existingGoals];
-
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedGoals));
+      // Save to API — same source the savings screen reads from
+      await addSavingsGoal({ name: name.trim(), targetAmount: numericTarget });
 
       // Create notification
       await addNotification({
@@ -65,8 +53,12 @@ export default function AddSavingsGoal() {
       router.back();
     } catch (error) {
       console.log("Create goal error:", error);
-
-      Alert.alert("Error", "Failed to create savings goal");
+      Alert.alert(
+        "Error",
+        "Failed to create savings goal. Make sure the server is running.",
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,7 +76,7 @@ export default function AddSavingsGoal() {
         onChangeText={setName}
       />
 
-      <Text style={styles.label}>Target Amount</Text>
+      <Text style={styles.label}>Target Amount (₹)</Text>
 
       <TextInput
         style={styles.input}
@@ -95,8 +87,14 @@ export default function AddSavingsGoal() {
         onChangeText={setTargetAmount}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleCreateGoal}>
-        <Text style={styles.buttonText}>Create Goal</Text>
+      <TouchableOpacity
+        style={[styles.button, loading && styles.buttonDisabled]}
+        onPress={handleCreateGoal}
+        disabled={loading}
+      >
+        <Text style={styles.buttonText}>
+          {loading ? "Creating..." : "Create Goal"}
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -139,6 +137,7 @@ const styles = StyleSheet.create({
     padding: 14,
     fontSize: 16,
     marginBottom: 20,
+    color: "#111827",
   },
 
   button: {
@@ -147,6 +146,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
+  },
+
+  buttonDisabled: {
+    backgroundColor: "#93C5FD",
   },
 
   buttonText: {
