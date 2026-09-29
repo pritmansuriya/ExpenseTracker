@@ -28,13 +28,23 @@ export default function SavingsGoalScreen() {
       const response = await getSavingsGoals();
 
       console.log("Savings goals from API:", response);
+      console.log("Is array:", Array.isArray(response));
 
-      setGoals(response);
-    } catch (error) {
-      console.log("Error loading savings goals:", error);
+      if (Array.isArray(response)) {
+        setGoals(response);
+      } else {
+        console.log("Invalid response:", response);
+        setGoals([]);
+      }
+    } catch (error: any) {
+      console.log(
+        "Error loading savings goals:",
+        error?.response?.data || error?.message || error,
+      );
+
+      setGoals([]);
     }
   };
-
   // Reload whenever this screen becomes active
   useFocusEffect(
     useCallback(() => {

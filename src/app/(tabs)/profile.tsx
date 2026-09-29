@@ -289,7 +289,7 @@ export default function ProfileScreen() {
           <MenuItem
             icon="key-outline"
             title="Change Password"
-            onPress={() => handlePress("Change Password")}
+            onPress={() => router.push("/change-password")}
           />
 
           <MenuItem
@@ -313,19 +313,19 @@ export default function ProfileScreen() {
           <MenuItem
             icon="help-circle-outline"
             title="Help & Support"
-            onPress={() => handlePress("Help & Support")}
+            onPress={() => router.push("/help-support")}
           />
 
           <MenuItem
             icon="shield-checkmark-outline"
             title="Privacy Policy"
-            onPress={() => handlePress("Privacy Policy")}
+            onPress={() => router.push("/privacy-policy")}
           />
 
           <MenuItem
             icon="information-circle-outline"
             title="About Expense Tracker"
-            onPress={() => handlePress("About Expense Tracker")}
+            onPress={() => router.push("/about-expense-tracker")}
             showDivider={false}
           />
         </View>
