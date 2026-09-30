@@ -1,88 +1,162 @@
 const express = require("express");
+const SavingsGoal = require("../models/savingsGoal");
 
 const router = express.Router();
 
-let savingsGoals = [];
+// GET all savings goals
+router.get("/", async (req, res) => {
+  try {
+    const goals = await SavingsGoal.find().sort({ createdAt: -1 });
 
-// GET all goals
-router.get("/", (req, res) => {
-  console.log("GET goals:", savingsGoals);
-  res.json(savingsGoals);
+    const formattedGoals = goals.map((goal) => ({
+      id: goal._id.toString(),
+      name: goal.name,
+      targetAmount: goal.targetAmount,
+      savedAmount: goal.savedAmount,
+      createdAt: goal.createdAt,
+    }));
+
+    console.log("GET goals:", formattedGoals);
+
+    res.json(formattedGoals);
+  } catch (error) {
+    console.error("GET goals error:", error);
+
+    res.status(500).json({
+      message: "Failed to get savings goals",
+    });
+  }
 });
 
-// GET single goal by ID
-router.get("/:id", (req, res) => {
-  const goal = savingsGoals.find((g) => g.id === req.params.id);
+// GET single savings goal
+router.get("/:id", async (req, res) => {
+  try {
+    const goal = await SavingsGoal.findById(req.params.id);
 
-  if (!goal) {
-    return res.status(404).json({ message: "Savings goal not found" });
+    if (!goal) {
+      return res.status(404).json({
+        message: "Savings goal not found",
+      });
+    }
+
+    res.json({
+      id: goal._id.toString(),
+      name: goal.name,
+      targetAmount: goal.targetAmount,
+      savedAmount: goal.savedAmount,
+      createdAt: goal.createdAt,
+    });
+  } catch (error) {
+    console.error("GET single goal error:", error);
+
+    res.status(500).json({
+      message: "Failed to get savings goal",
+    });
   }
-
-  res.json(goal);
 });
 
-// POST new goal
-router.post("/", (req, res) => {
-  console.log("POST body:", req.body);
+// POST new savings goal
+router.post("/", async (req, res) => {
+  try {
+    console.log("POST body:", req.body);
 
-  const { name, targetAmount } = req.body;
+    const { name, targetAmount } = req.body;
 
-  if (!name || targetAmount === undefined) {
-    return res
-      .status(400)
-      .json({ message: "name and targetAmount are required" });
+    if (!name || targetAmount === undefined) {
+      return res.status(400).json({
+        message: "name and targetAmount are required",
+      });
+    }
+
+    const newGoal = await SavingsGoal.create({
+      name: name,
+      targetAmount: Number(targetAmount),
+      savedAmount: 0,
+    });
+
+    const formattedGoal = {
+      id: newGoal._id.toString(),
+      name: newGoal.name,
+      targetAmount: newGoal.targetAmount,
+      savedAmount: newGoal.savedAmount,
+      createdAt: newGoal.createdAt,
+    };
+
+    console.log("Goal saved:", formattedGoal);
+
+    res.status(201).json({
+      message: "Savings goal created successfully",
+      data: formattedGoal,
+    });
+  } catch (error) {
+    console.error("POST goal error:", error);
+
+    res.status(500).json({
+      message: "Failed to create savings goal",
+    });
   }
-
-  const newGoal = {
-    id: Date.now().toString(),
-    name: name,
-    targetAmount: Number(targetAmount),
-    savedAmount: 0,
-    createdAt: new Date().toISOString(),
-  };
-
-  savingsGoals.unshift(newGoal);
-
-  console.log("Goals after POST:", savingsGoals);
-
-  res.status(201).json({
-    ...newGoal,
-    message: "Savings goal created successfully",
-    data: newGoal,
-  });
 });
 
-// PATCH add money to goal
-router.patch("/:id/add-money", (req, res) => {
-  const { amount } = req.body;
+// PATCH - add money to savings goal
+router.patch("/:id/add-money", async (req, res) => {
+  try {
+    const { amount } = req.body;
 
-  if (!amount || Number(amount) <= 0) {
-    return res
-      .status(400)
-      .json({ message: "A valid positive amount is required" });
+    if (!amount || Number(amount) <= 0) {
+      return res.status(400).json({
+        message: "A valid positive amount is required",
+      });
+    }
+
+    const goal = await SavingsGoal.findById(req.params.id);
+
+    if (!goal) {
+      return res.status(404).json({
+        message: "Savings goal not found",
+      });
+    }
+
+    goal.savedAmount += Number(amount);
+
+    await goal.save();
+
+    res.json({
+      id: goal._id.toString(),
+      name: goal.name,
+      targetAmount: goal.targetAmount,
+      savedAmount: goal.savedAmount,
+      createdAt: goal.createdAt,
+    });
+  } catch (error) {
+    console.error("Add money error:", error);
+
+    res.status(500).json({
+      message: "Failed to add money",
+    });
   }
-
-  const goalIndex = savingsGoals.findIndex((g) => g.id === req.params.id);
-
-  if (goalIndex === -1) {
-    return res.status(404).json({ message: "Savings goal not found" });
-  }
-
-  savingsGoals[goalIndex].savedAmount += Number(amount);
-
-  res.json(savingsGoals[goalIndex]);
 });
 
-// DELETE goal
-router.delete("/:id", (req, res) => {
-  const initialLength = savingsGoals.length;
-  savingsGoals = savingsGoals.filter((g) => g.id !== req.params.id);
+// DELETE savings goal
+router.delete("/:id", async (req, res) => {
+  try {
+    const goal = await SavingsGoal.findByIdAndDelete(req.params.id);
 
-  if (savingsGoals.length === initialLength) {
-    return res.status(404).json({ message: "Savings goal not found" });
+    if (!goal) {
+      return res.status(404).json({
+        message: "Savings goal not found",
+      });
+    }
+
+    res.json({
+      message: "Savings goal deleted successfully",
+    });
+  } catch (error) {
+    console.error("DELETE goal error:", error);
+
+    res.status(500).json({
+      message: "Failed to delete savings goal",
+    });
   }
-
-  res.json({ message: "Savings goal deleted successfully" });
 });
 
 module.exports = router;

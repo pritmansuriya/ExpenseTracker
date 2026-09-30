@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -8,8 +9,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-import { getSavingsGoals } from "@/services/savingsApi";
 
 type SavingsGoal = {
   id: string;
@@ -25,23 +24,25 @@ export default function SavingsGoalScreen() {
   // Load goals from AsyncStorage
   const loadGoals = async () => {
     try {
-      const response = await getSavingsGoals();
+      const data = await AsyncStorage.getItem("savingsGoals");
 
-      console.log("Savings goals from API:", response);
-      console.log("Is array:", Array.isArray(response));
+      console.log("Savings goals from storage:", data);
 
-      if (Array.isArray(response)) {
-        setGoals(response);
+      if (data) {
+        const parsedGoals = JSON.parse(data);
+
+        console.log("Parsed goals:", parsedGoals);
+
+        if (Array.isArray(parsedGoals)) {
+          setGoals(parsedGoals);
+        } else {
+          setGoals([]);
+        }
       } else {
-        console.log("Invalid response:", response);
         setGoals([]);
       }
-    } catch (error: any) {
-      console.log(
-        "Error loading savings goals:",
-        error?.response?.data || error?.message || error,
-      );
-
+    } catch (error) {
+      console.log("Error loading savings goals:", error);
       setGoals([]);
     }
   };

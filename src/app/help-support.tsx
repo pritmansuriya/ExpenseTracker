@@ -1,27 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function HelpSupportScreen() {
   const router = useRouter();
 
   return (
     <View style={styles.container}>
-      {/* <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={26} color="#111827" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>Help & Support</Text>
-
-        <View style={{ width: 26 }} />
-      </View> */}
-
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.iconContainer}>
           <Ionicons name="help-circle" size={55} color="#2563EB" />

@@ -1,5 +1,5 @@
-import { addMoneyToGoal, getSavingsGoalById } from "@/services/savingsApi";
 import { addNotification } from "@/utils/notificationStorage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -28,13 +28,29 @@ export default function AddMoneyScreen() {
   useEffect(() => {
     loadGoal();
   }, [goalId]);
-
   const loadGoal = async () => {
     try {
-      const data = await getSavingsGoalById(goalId);
-      setGoal(data);
+      const data = await AsyncStorage.getItem("savingsGoals");
+
+      if (!data) {
+        setGoal(null);
+        return;
+      }
+
+      const goals: SavingsGoal[] = JSON.parse(data);
+
+      const selectedGoal = goals.find((item) => item.id === goalId);
+
+      if (!selectedGoal) {
+        Alert.alert("Error", "Savings goal not found");
+        setGoal(null);
+        return;
+      }
+
+      setGoal(selectedGoal);
     } catch (error) {
       console.log("Error loading goal:", error);
+      Alert.alert("Error", "Failed to load savings goal");
     }
   };
 
@@ -61,15 +77,23 @@ export default function AddMoneyScreen() {
     if (newSavedAmount > goal.targetAmount) {
       Alert.alert(
         "Over Target",
-        `Adding ₹${numericAmount.toLocaleString("en-IN")} would exceed the target by ₹${(newSavedAmount - goal.targetAmount).toLocaleString("en-IN")}. Continue?`,
+        `Adding ₹${numericAmount.toLocaleString(
+          "en-IN",
+        )} would exceed the target by ₹${(
+          newSavedAmount - goal.targetAmount
+        ).toLocaleString("en-IN")}. Continue?`,
         [
-          { text: "Cancel", style: "cancel" },
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
           {
             text: "Yes, Add",
             onPress: () => saveMoney(numericAmount),
           },
         ],
       );
+
       return;
     }
 
@@ -77,29 +101,58 @@ export default function AddMoneyScreen() {
   };
 
   const saveMoney = async (numericAmount: number) => {
+    if (!goal) {
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // Call API to add money
-      const updatedGoal = await addMoneyToGoal(goalId, numericAmount);
+      const data = await AsyncStorage.getItem("savingsGoals");
 
-      // Update local state with response
-      setGoal(updatedGoal);
+      if (!data) {
+        Alert.alert("Error", "No savings goals found");
+        return;
+      }
 
-      // Create notification
+      const goals: SavingsGoal[] = JSON.parse(data);
+
+      const updatedGoals = goals.map((item) => {
+        if (item.id === goal.id) {
+          return {
+            ...item,
+            savedAmount: item.savedAmount + numericAmount,
+          };
+        }
+
+        return item;
+      });
+
+      await AsyncStorage.setItem("savingsGoals", JSON.stringify(updatedGoals));
+
+      const updatedGoal = updatedGoals.find((item) => item.id === goal.id);
+
+      if (updatedGoal) {
+        setGoal(updatedGoal);
+      }
+
       await addNotification({
         id: Date.now().toString(),
         title: "Savings Progress",
-        message: `Added ₹${numericAmount.toLocaleString("en-IN")} to "${goal?.name}".`,
+        message: `Added ₹${numericAmount.toLocaleString(
+          "en-IN",
+        )} to "${goal.name}".`,
         amount: numericAmount,
         type: "saving",
         createdAt: new Date().toISOString(),
         read: false,
       });
 
+      setAmount("");
+
       Alert.alert(
         "Success",
-        `₹${numericAmount.toLocaleString("en-IN")} added to "${goal?.name}"`,
+        `₹${numericAmount.toLocaleString("en-IN")} added to "${goal.name}"`,
         [
           {
             text: "OK",
@@ -109,10 +162,8 @@ export default function AddMoneyScreen() {
       );
     } catch (error) {
       console.log("Error saving money:", error);
-      Alert.alert(
-        "Error",
-        "Failed to add money. Make sure the server is running.",
-      );
+
+      Alert.alert("Error", "Failed to add money. Please try again.");
     } finally {
       setLoading(false);
     }

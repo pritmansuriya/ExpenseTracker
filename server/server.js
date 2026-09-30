@@ -1,9 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 
+const connectDB = require("./config/db");
+const savingsRoutes = require("./routes/savingsRoutes");
+
 const app = express();
 
-const savingsRoutes = require("./routes/savingsRoutes");
+// Connect to MongoDB
+connectDB();
 
 app.use(cors());
 app.use(express.json());
@@ -14,11 +18,11 @@ app.get("/", (req, res) => {
   });
 });
 
+// Savings Goals API
 app.use("/api/savings-goal", savingsRoutes);
-app.use("/api/savings-goals", savingsRoutes);
 
 const PORT = 5000;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

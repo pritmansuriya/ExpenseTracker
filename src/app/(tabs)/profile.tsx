@@ -15,10 +15,16 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+type profile = {
+  name: string;
+  email: string;
+  phone: string;
+};
+
 export default function ProfileScreen() {
   const { isDarkMode, toggleDarkMode } = useTheme();
 
-  const [profile, setProfile] = useState({
+  const [profile, setProfile] = useState<profile>({
     name: "User",
     email: "user@example.com",
     phone: "+91 98765 43210",
@@ -219,31 +225,7 @@ export default function ProfileScreen() {
             icon="wallet-outline"
             title="Monthly Budget"
             value="₹ 30,000"
-            onPress={() => handlePress("Monthly Budget")}
-            showDivider={false}
-          />
-        </View>
-
-        {/* Notifications */}
-        <SectionTitle title="Notifications" />
-
-        <View style={styles.section}>
-          <MenuItem
-            icon="alarm-outline"
-            title="Expense Reminders"
-            onPress={() => handlePress("Expense Reminders")}
-          />
-
-          <MenuItem
-            icon="notifications-outline"
-            title="Budget Alerts"
-            onPress={() => handlePress("Budget Alerts")}
-          />
-
-          <MenuItem
-            icon="calendar-outline"
-            title="Monthly Summary"
-            onPress={() => handlePress("Monthly Summary")}
+            onPress={() => router.push("/monthly-budget")}
             showDivider={false}
           />
         </View>
@@ -269,12 +251,6 @@ export default function ProfileScreen() {
           />
 
           <MenuItem
-            icon="sunny-outline"
-            title="Light Mode"
-            onPress={() => handlePress("Light Mode")}
-          />
-
-          <MenuItem
             icon="phone-portrait-outline"
             title="System Default"
             onPress={() => handlePress("System Default")}
@@ -294,15 +270,14 @@ export default function ProfileScreen() {
 
           <MenuItem
             icon="lock-closed-outline"
-            title="App Lock / PIN"
-            onPress={() => handlePress("App Lock / PIN")}
+            title="Set PIN"
+            onPress={() => router.push("/app-lock")}
           />
 
           <MenuItem
-            icon="finger-print-outline"
-            title="Biometric Login"
-            onPress={() => handlePress("Biometric Login")}
-            showDivider={false}
+            icon="lock-closed-outline"
+            title=" Change PIN"
+            onPress={() => router.push("/change-pin")}
           />
         </View>
 

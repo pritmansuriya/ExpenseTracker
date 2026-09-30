@@ -3,16 +3,29 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 const STORAGE_KEY = "transactions";
+
+const TRANSACTION_TYPES = [
+  { label: "All", value: "all" },
+  { label: "Income", value: "income" },
+  { label: "Expense", value: "expense" },
+];
+
+const DATE_FILTERS = [
+  { label: "All", value: "all" },
+  { label: "Today", value: "today" },
+  { label: "This Week", value: "week" },
+  { label: "This Month", value: "month" },
+];
 
 type Transaction = {
   id: string;
@@ -98,35 +111,15 @@ export default function TransactionsScreen() {
 
   // Check date filter
   const matchesDateFilter = (transactionDate: string) => {
-    if (dateFilter === "all") {
-      return true;
-    }
+    if (dateFilter === "all") return true;
 
     const transactionDateObject = new Date(transactionDate);
     const today = new Date();
 
-    // Today
     if (dateFilter === "today") {
-      return (
-        transactionDateObject.getDate() === today.getDate() &&
-        transactionDateObject.getMonth() === today.getMonth() &&
-        transactionDateObject.getFullYear() === today.getFullYear()
-      );
+      return transactionDateObject.toDateString() === today.toDateString();
     }
 
-    // This Week
-    if (dateFilter === "week") {
-      const startOfWeek = new Date(today);
-
-      const day = today.getDay();
-
-      startOfWeek.setDate(today.getDate() - day);
-      startOfWeek.setHours(0, 0, 0, 0);
-
-      return transactionDateObject >= startOfWeek;
-    }
-
-    // This Month
     if (dateFilter === "month") {
       return (
         transactionDateObject.getMonth() === today.getMonth() &&
@@ -134,9 +127,17 @@ export default function TransactionsScreen() {
       );
     }
 
+    if (dateFilter === "week") {
+      const startOfWeek = new Date(today);
+
+      startOfWeek.setDate(today.getDate() - today.getDay());
+      startOfWeek.setHours(0, 0, 0, 0);
+
+      return transactionDateObject >= startOfWeek;
+    }
+
     return true;
   };
-
   // Apply all filters
   const filteredTransactions = transactions.filter((transaction) => {
     // Search
@@ -223,53 +224,25 @@ export default function TransactionsScreen() {
       <Text style={styles.sectionTitle}>Transaction Type</Text>
 
       <View style={styles.filterContainer}>
-        <TouchableOpacity
-          style={[styles.filterButton, filter === "all" && styles.activeFilter]}
-          onPress={() => setFilter("all")}
-        >
-          <Text
+        {TRANSACTION_TYPES.map((item) => (
+          <TouchableOpacity
+            key={item.value}
             style={[
-              styles.filterText,
-              filter === "all" && styles.activeFilterText,
+              styles.filterButton,
+              filter === item.value && styles.activeFilter,
             ]}
+            onPress={() => setFilter(item.value as FilterType)}
           >
-            All
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            filter === "income" && styles.activeIncomeFilter,
-          ]}
-          onPress={() => setFilter("income")}
-        >
-          <Text
-            style={[
-              styles.filterText,
-              filter === "income" && styles.activeFilterText,
-            ]}
-          >
-            Income
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            filter === "expense" && styles.activeExpenseFilter,
-          ]}
-          onPress={() => setFilter("expense")}
-        >
-          <Text
-            style={[
-              styles.filterText,
-              filter === "expense" && styles.activeFilterText,
-            ]}
-          >
-            Expense
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={[
+                styles.filterText,
+                filter === item.value && styles.activeFilterText,
+              ]}
+            >
+              {item.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
       {/* Category */}
@@ -309,73 +282,25 @@ export default function TransactionsScreen() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.horizontalList}
       >
-        <TouchableOpacity
-          style={[
-            styles.dateButton,
-            dateFilter === "all" && styles.activeDateButton,
-          ]}
-          onPress={() => setDateFilter("all")}
-        >
-          <Text
+        {DATE_FILTERS.map((item) => (
+          <TouchableOpacity
+            key={item.value}
             style={[
-              styles.dateButtonText,
-              dateFilter === "all" && styles.activeDateText,
+              styles.dateButton,
+              dateFilter === item.value && styles.activeDateButton,
             ]}
+            onPress={() => setDateFilter(item.value as DateFilter)}
           >
-            All
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.dateButton,
-            dateFilter === "today" && styles.activeDateButton,
-          ]}
-          onPress={() => setDateFilter("today")}
-        >
-          <Text
-            style={[
-              styles.dateButtonText,
-              dateFilter === "today" && styles.activeDateText,
-            ]}
-          >
-            Today
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.dateButton,
-            dateFilter === "week" && styles.activeDateButton,
-          ]}
-          onPress={() => setDateFilter("week")}
-        >
-          <Text
-            style={[
-              styles.dateButtonText,
-              dateFilter === "week" && styles.activeDateText,
-            ]}
-          >
-            This Week
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.dateButton,
-            dateFilter === "month" && styles.activeDateButton,
-          ]}
-          onPress={() => setDateFilter("month")}
-        >
-          <Text
-            style={[
-              styles.dateButtonText,
-              dateFilter === "month" && styles.activeDateText,
-            ]}
-          >
-            This Month
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={[
+                styles.dateButtonText,
+                dateFilter === item.value && styles.activeDateText,
+              ]}
+            >
+              {item.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
 
       {/* Results */}

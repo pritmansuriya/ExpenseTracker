@@ -13,14 +13,13 @@ import {
 import { Notification } from "@/types/notification";
 import {
     clearAllNotifications,
+    deleteNotification,
     getNotifications,
     markNotificationAsRead,
-    deleteNotification as removeNotificationStorage,
 } from "@/utils/notificationStorage";
 
 export default function NotificationScreen() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const loadNotifications = async () => {
     try {
@@ -28,8 +27,6 @@ export default function NotificationScreen() {
       setNotifications(data);
     } catch (error) {
       console.log("Error loading notifications:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -57,7 +54,7 @@ export default function NotificationScreen() {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
-            const updated = await removeNotificationStorage(id);
+            const updated = await deleteNotification(id);
             setNotifications(updated);
           },
         },
@@ -164,7 +161,7 @@ export default function NotificationScreen() {
     <View style={styles.container}>
       <View style={styles.headerRow}>
         <Text style={styles.header}>Notifications</Text>
-        {notifications && notifications.length > 0 && (
+        {notifications.length > 0 && (
           <TouchableOpacity
             style={styles.clearAllButton}
             onPress={handleClearAll}
@@ -174,7 +171,7 @@ export default function NotificationScreen() {
         )}
       </View>
 
-      {!notifications || notifications.length === 0 ? (
+      {notifications.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons
             name="notifications-off-outline"

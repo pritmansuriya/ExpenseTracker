@@ -5,6 +5,38 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <Stack>
+        {/* App Entry */}
+        <Stack.Screen
+          name="index"
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        {/* App Lock */}
+        <Stack.Screen
+          name="enter-pin"
+          options={{
+            headerShown: false,
+            gestureEnabled: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="app-lock"
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="change-pin"
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        {/* Main Application */}
         <Stack.Screen
           name="(tabs)"
           options={{
@@ -12,6 +44,7 @@ export default function RootLayout() {
           }}
         />
 
+        {/* Accounts */}
         <Stack.Screen
           name="accounts"
           options={{
