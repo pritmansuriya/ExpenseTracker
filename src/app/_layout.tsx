@@ -1,10 +1,25 @@
-import { ThemeProvider } from "@/context/ThemeContext";
+import ScreenBackdrop from "@/components/ScreenBackdrop";
+import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import { Stack } from "expo-router";
+import { StyleSheet, View } from "react-native";
 
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <Stack>
+      <AppNavigator />
+    </ThemeProvider>
+  );
+}
+
+function AppNavigator() {
+  const { colors } = useTheme();
+
+  return (
+    <View style={[styles.shell, { backgroundColor: colors.background }]}>
+      <ScreenBackdrop />
+      <Stack
+        screenOptions={{ contentStyle: { backgroundColor: "transparent" } }}
+      >
         {/* App Entry */}
         <Stack.Screen
           name="index"
@@ -16,6 +31,14 @@ export default function RootLayout() {
         {/* App Lock */}
         <Stack.Screen
           name="enter-pin"
+          options={{
+            headerShown: false,
+            gestureEnabled: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="forgot-pin"
           options={{
             headerShown: false,
             gestureEnabled: false,
@@ -66,6 +89,12 @@ export default function RootLayout() {
           }}
         />
       </Stack>
-    </ThemeProvider>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  shell: {
+    flex: 1,
+  },
+});

@@ -1,24 +1,26 @@
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-    Alert,
-    FlatList,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { Notification } from "@/types/notification";
 import {
-    clearAllNotifications,
-    deleteNotification,
-    getNotifications,
-    markNotificationAsRead,
+  clearAllNotifications,
+  deleteNotification,
+  getNotifications,
+  markNotificationAsRead,
 } from "@/utils/notificationStorage";
 
 export default function NotificationScreen() {
+  const { isDarkMode } = useTheme();
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const loadNotifications = async () => {
@@ -113,7 +115,14 @@ export default function NotificationScreen() {
   const renderNotification = ({ item }: { item: Notification }) => {
     return (
       <TouchableOpacity
-        style={[styles.notificationCard, !item.read && styles.unreadCard]}
+        style={[
+          styles.notificationCard,
+          {
+            backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+            borderLeftColor: item.read ? "transparent" : "#2563EB",
+          },
+          !item.read && styles.unreadCard,
+        ]}
         onPress={() => handleMarkAsRead(item.id)}
         activeOpacity={0.8}
       >
@@ -123,11 +132,25 @@ export default function NotificationScreen() {
 
         <View style={styles.content}>
           <View style={styles.titleRow}>
-            <Text style={styles.title}>{item.title}</Text>
+            <Text
+              style={[
+                styles.title,
+                { color: isDarkMode ? "#F9FAFB" : "#111827" },
+              ]}
+            >
+              {item.title}
+            </Text>
             {!item.read && <View style={styles.unreadDot} />}
           </View>
 
-          <Text style={styles.message}>{item.message}</Text>
+          <Text
+            style={[
+              styles.message,
+              { color: isDarkMode ? "#D1D5DB" : "#6B7280" },
+            ]}
+          >
+            {item.message}
+          </Text>
 
           <View style={styles.bottomRow}>
             {item.amount !== undefined ? (
@@ -136,7 +159,12 @@ export default function NotificationScreen() {
               <View />
             )}
 
-            <Text style={styles.time}>
+            <Text
+              style={[
+                styles.time,
+                { color: isDarkMode ? "#9CA3AF" : "#9CA3AF" },
+              ]}
+            >
               {new Date(item.createdAt).toLocaleTimeString("en-IN", {
                 hour: "numeric",
                 minute: "2-digit",
@@ -145,28 +173,45 @@ export default function NotificationScreen() {
           </View>
         </View>
 
-        {/* Visible Delete Button */}
         <TouchableOpacity
           style={styles.deleteButton}
           onPress={() => handleDeleteNotification(item.id)}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons name="trash-outline" size={19} color="#9CA3AF" />
+          <Ionicons
+            name="trash-outline"
+            size={19}
+            color={isDarkMode ? "#D1D5DB" : "#9CA3AF"}
+          />
         </TouchableOpacity>
       </TouchableOpacity>
     );
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: "transparent" }]}>
       <View style={styles.headerRow}>
-        <Text style={styles.header}>Notifications</Text>
+        <Text
+          style={[styles.header, { color: isDarkMode ? "#F9FAFB" : "#111827" }]}
+        >
+          Notifications
+        </Text>
         {notifications.length > 0 && (
           <TouchableOpacity
-            style={styles.clearAllButton}
+            style={[
+              styles.clearAllButton,
+              { backgroundColor: isDarkMode ? "#374151" : "#FEE2E2" },
+            ]}
             onPress={handleClearAll}
           >
-            <Text style={styles.clearAllText}>Clear All</Text>
+            <Text
+              style={[
+                styles.clearAllText,
+                { color: isDarkMode ? "#FCA5A5" : "#DC2626" },
+              ]}
+            >
+              Clear All
+            </Text>
           </TouchableOpacity>
         )}
       </View>
@@ -176,10 +221,17 @@ export default function NotificationScreen() {
           <Ionicons
             name="notifications-off-outline"
             size={60}
-            color="#9CA3AF"
+            color={isDarkMode ? "#9CA3AF" : "#9CA3AF"}
           />
 
-          <Text style={styles.emptyText}>No notifications</Text>
+          <Text
+            style={[
+              styles.emptyText,
+              { color: isDarkMode ? "#D1D5DB" : "#6B7280" },
+            ]}
+          >
+            No notifications
+          </Text>
         </View>
       ) : (
         <FlatList

@@ -1,34 +1,40 @@
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function AboutExpenseTrackerScreen() {
-  const router = useRouter();
+  const { colors } = useTheme();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: "transparent" }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.logo}>
           <Ionicons name="wallet" size={55} color="#FFFFFF" />
         </View>
 
-        <Text style={styles.appName}>Expense Tracker</Text>
+        <Text style={[styles.appName, { color: colors.text }]}>
+          Expense Tracker
+        </Text>
 
-        <Text style={styles.version}>Version 1.0.0</Text>
+        <Text style={[styles.version, { color: colors.textSecondary }]}>
+          Version 1.0.0
+        </Text>
 
-        <Text style={styles.description}>
+        <Text style={[styles.description, { color: colors.textSecondary }]}>
           Expense Tracker is a simple and user-friendly mobile application
           designed to help you manage your daily finances, track expenses,
           monitor income, and achieve your savings goals.
         </Text>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>What You Can Do</Text>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: colors.card, borderColor: colors.cardBorder },
+          ]}
+        >
+          <Text style={[styles.cardTitle, { color: colors.text }]}>
+            What You Can Do
+          </Text>
 
           <Feature
             icon="wallet-outline"
@@ -61,21 +67,38 @@ export default function AboutExpenseTrackerScreen() {
           />
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Built With</Text>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: colors.card, borderColor: colors.cardBorder },
+          ]}
+        >
+          <Text style={[styles.cardTitle, { color: colors.text }]}>
+            Built With
+          </Text>
 
-          <Text style={styles.tech}>⚛️ React Native</Text>
-          <Text style={styles.tech}>📱 Expo</Text>
-          <Text style={styles.tech}>🟦 TypeScript</Text>
-          <Text style={styles.tech}>💾 AsyncStorage</Text>
+          <Text style={[styles.tech, { color: colors.textSecondary }]}>
+            ⚛️ React Native
+          </Text>
+          <Text style={[styles.tech, { color: colors.textSecondary }]}>
+            📱 Expo
+          </Text>
+          <Text style={[styles.tech, { color: colors.textSecondary }]}>
+            🟦 TypeScript
+          </Text>
+          <Text style={[styles.tech, { color: colors.textSecondary }]}>
+            💾 AsyncStorage
+          </Text>
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
+          <Text style={[styles.footerText, { color: colors.textSecondary }]}>
             Made with ❤️ for simple and better personal finance management.
           </Text>
 
-          <Text style={styles.copyright}>© 2026 Expense Tracker</Text>
+          <Text style={[styles.copyright, { color: colors.textSecondary }]}>
+            © 2026 Expense Tracker
+          </Text>
         </View>
       </ScrollView>
     </View>
@@ -91,13 +114,19 @@ function Feature({
   title: string;
   text: string;
 }) {
+  const { colors } = useTheme();
+
   return (
     <View style={styles.feature}>
       <Ionicons name={icon} size={25} color="#2563EB" />
 
       <View style={styles.featureContent}>
-        <Text style={styles.featureTitle}>{title}</Text>
-        <Text style={styles.featureText}>{text}</Text>
+        <Text style={[styles.featureTitle, { color: colors.text }]}>
+          {title}
+        </Text>
+        <Text style={[styles.featureText, { color: colors.textSecondary }]}>
+          {text}
+        </Text>
       </View>
     </View>
   );

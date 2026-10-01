@@ -1,14 +1,15 @@
+import { useTheme } from "@/context/ThemeContext";
 import { addNotification } from "@/utils/notificationStorage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
-    Alert,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const STORAGE_KEY = "transactions";
@@ -16,6 +17,7 @@ const STORAGE_KEY = "transactions";
 type TransactionType = "income" | "expense";
 
 export default function AddTransactions() {
+  const { colors } = useTheme();
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
@@ -84,11 +86,15 @@ export default function AddTransactions() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Add Transaction</Text>
+    <View style={[styles.container, { backgroundColor: "transparent" }]}>
+      <Text style={[styles.heading, { color: colors.text }]}>
+        Add Transaction
+      </Text>
 
       {/* Transaction Type */}
-      <Text style={styles.label}>Transaction Type</Text>
+      <Text style={[styles.label, { color: colors.text }]}>
+        Transaction Type
+      </Text>
 
       <View style={styles.radioContainer}>
         {/* Expense */}
@@ -100,7 +106,9 @@ export default function AddTransactions() {
             {type === "expense" && <View style={styles.radioInner} />}
           </View>
 
-          <Text style={styles.radioText}>Expense</Text>
+          <Text style={[styles.radioText, { color: colors.text }]}>
+            Expense
+          </Text>
         </TouchableOpacity>
 
         {/* Income */}
@@ -112,37 +120,61 @@ export default function AddTransactions() {
             {type === "income" && <View style={styles.radioInner} />}
           </View>
 
-          <Text style={styles.radioText}>Income</Text>
+          <Text style={[styles.radioText, { color: colors.text }]}>Income</Text>
         </TouchableOpacity>
       </View>
 
       {/* Title */}
-      <Text style={styles.label}>Title</Text>
+      <Text style={[styles.label, { color: colors.text }]}>Title</Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            color: colors.text,
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
         placeholder="e.g. Grocery Shopping"
+        placeholderTextColor={colors.textSecondary}
         value={title}
         onChangeText={setTitle}
       />
 
       {/* Amount */}
-      <Text style={styles.label}>Amount</Text>
+      <Text style={[styles.label, { color: colors.text }]}>Amount</Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            color: colors.text,
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
         placeholder="Enter amount"
+        placeholderTextColor={colors.textSecondary}
         keyboardType="numeric"
         value={amount}
         onChangeText={setAmount}
       />
 
       {/* Category */}
-      <Text style={styles.label}>Category</Text>
+      <Text style={[styles.label, { color: colors.text }]}>Category</Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            color: colors.text,
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
         placeholder="e.g. Food, Salary, Bills"
+        placeholderTextColor={colors.textSecondary}
         value={category}
         onChangeText={setCategory}
       />

@@ -12,6 +12,6 @@ export const getBudget = async (): Promise<number> => {
   return Number(data);
 };
 
-export const saveBudget = async (amount: Number) => {
+export const saveBudget = async (amount: number) => {
   await AsyncStorage.setItem(STORAGE_KEY, amount.toString());
 };

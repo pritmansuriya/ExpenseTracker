@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Transaction = {
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export default function TransactionItem({ transaction, onDelete }: Props) {
+  const { isDarkMode } = useTheme();
   const isIncome = transaction.type === "income";
 
   const handleDelete = () => {
@@ -36,25 +38,49 @@ export default function TransactionItem({ transaction, onDelete }: Props) {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Left side */}
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF" },
+      ]}
+    >
       <View style={styles.leftSection}>
-        <View style={styles.iconContainer}>
+        <View
+          style={[
+            styles.iconContainer,
+            { backgroundColor: isDarkMode ? "#0F172A" : "#F3F4F6" },
+          ]}
+        >
           <Text style={styles.icon}>{isIncome ? "💰" : "💸"}</Text>
         </View>
 
         <View style={styles.info}>
-          <Text style={styles.title}>{transaction.title}</Text>
+          <Text
+            style={[
+              styles.title,
+              { color: isDarkMode ? "#F9FAFB" : "#111827" },
+            ]}
+          >
+            {transaction.title}
+          </Text>
 
-          <Text style={styles.category}>{transaction.category}</Text>
+          <Text
+            style={[
+              styles.category,
+              { color: isDarkMode ? "#D1D5DB" : "#6B7280" },
+            ]}
+          >
+            {transaction.category}
+          </Text>
 
-          <Text style={styles.date}>
+          <Text
+            style={[styles.date, { color: isDarkMode ? "#9CA3AF" : "#9CA3AF" }]}
+          >
             {new Date(transaction.date).toLocaleDateString()}
           </Text>
         </View>
       </View>
 
-      {/* Right side */}
       <View style={styles.rightSection}>
         <Text
           style={[
@@ -67,11 +93,22 @@ export default function TransactionItem({ transaction, onDelete }: Props) {
           {isIncome ? "+" : "-"} ₹{transaction.amount.toLocaleString("en-IN")}
         </Text>
 
-        {/* Delete button */}
-        {/* Delete button - only shown when onDelete is provided */}
         {onDelete && (
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-            <Text style={styles.deleteText}>Delete</Text>
+          <TouchableOpacity
+            style={[
+              styles.deleteButton,
+              { backgroundColor: isDarkMode ? "#374151" : "#FEE2E2" },
+            ]}
+            onPress={handleDelete}
+          >
+            <Text
+              style={[
+                styles.deleteText,
+                { color: isDarkMode ? "#FCA5A5" : "#DC2626" },
+              ]}
+            >
+              Delete
+            </Text>
           </TouchableOpacity>
         )}
       </View>

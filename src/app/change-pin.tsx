@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -13,6 +14,7 @@ import {
 const APP_LOCK_PIN = "appLockPin";
 
 export default function ChangePinScreen() {
+  const { isDarkMode } = useTheme();
   const [currentPin, setCurrentPin] = useState("");
   const [newPin, setNewPin] = useState("");
   const [confirmPin, setConfirmPin] = useState("");
@@ -82,61 +84,107 @@ export default function ChangePinScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Change PIN</Text>
+    <View style={[styles.container, { backgroundColor: "transparent" }]}>
+      <Text
+        style={[styles.title, { color: isDarkMode ? "#F9FAFB" : "#111827" }]}
+      >
+        Change PIN
+      </Text>
 
-      <Text style={styles.subtitle}>Update your App Lock PIN</Text>
+      <Text
+        style={[styles.subtitle, { color: isDarkMode ? "#9CA3AF" : "#6B7280" }]}
+      >
+        Update your App Lock PIN
+      </Text>
 
-      {/* Current PIN */}
-      <Text style={styles.label}>Current PIN</Text>
+      <Text
+        style={[styles.label, { color: isDarkMode ? "#E5E7EB" : "#374151" }]}
+      >
+        Current PIN
+      </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+            borderColor: isDarkMode ? "#374151" : "#D1D5DB",
+            color: isDarkMode ? "#F9FAFB" : "#111827",
+          },
+        ]}
         value={currentPin}
         onChangeText={setCurrentPin}
         placeholder="Enter current PIN"
+        placeholderTextColor={isDarkMode ? "#9CA3AF" : "#6B7280"}
         keyboardType="number-pad"
         secureTextEntry
         maxLength={4}
       />
 
-      {/* New PIN */}
-      <Text style={styles.label}>New PIN</Text>
+      <Text
+        style={[styles.label, { color: isDarkMode ? "#E5E7EB" : "#374151" }]}
+      >
+        New PIN
+      </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+            borderColor: isDarkMode ? "#374151" : "#D1D5DB",
+            color: isDarkMode ? "#F9FAFB" : "#111827",
+          },
+        ]}
         value={newPin}
         onChangeText={setNewPin}
         placeholder="Enter new PIN"
+        placeholderTextColor={isDarkMode ? "#9CA3AF" : "#6B7280"}
         keyboardType="number-pad"
         secureTextEntry
         maxLength={4}
       />
 
-      {/* Confirm PIN */}
-      <Text style={styles.label}>Confirm New PIN</Text>
+      <Text
+        style={[styles.label, { color: isDarkMode ? "#E5E7EB" : "#374151" }]}
+      >
+        Confirm New PIN
+      </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+            borderColor: isDarkMode ? "#374151" : "#D1D5DB",
+            color: isDarkMode ? "#F9FAFB" : "#111827",
+          },
+        ]}
         value={confirmPin}
         onChangeText={setConfirmPin}
         placeholder="Confirm new PIN"
+        placeholderTextColor={isDarkMode ? "#9CA3AF" : "#6B7280"}
         keyboardType="number-pad"
         secureTextEntry
         maxLength={4}
       />
 
-      {/* Change PIN Button */}
       <TouchableOpacity style={styles.button} onPress={handleChangePin}>
         <Text style={styles.buttonText}>Change PIN</Text>
       </TouchableOpacity>
 
-      {/* Cancel */}
       <TouchableOpacity
         style={styles.cancelButton}
         onPress={() => router.back()}
       >
-        <Text style={styles.cancelText}>Cancel</Text>
+        <Text
+          style={[
+            styles.cancelText,
+            { color: isDarkMode ? "#D1D5DB" : "#6B7280" },
+          ]}
+        >
+          Cancel
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -145,7 +193,6 @@ export default function ChangePinScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8FAFC",
     padding: 24,
     justifyContent: "center",
   },
@@ -153,14 +200,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#111827",
     textAlign: "center",
     marginBottom: 8,
   },
 
   subtitle: {
     fontSize: 15,
-    color: "#6B7280",
     textAlign: "center",
     marginBottom: 35,
   },
@@ -168,16 +213,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#374151",
     marginBottom: 8,
     marginTop: 15,
   },
 
   input: {
     height: 52,
-    backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#D1D5DB",
     borderRadius: 10,
     paddingHorizontal: 16,
     fontSize: 18,
@@ -207,7 +249,6 @@ const styles = StyleSheet.create({
   },
 
   cancelText: {
-    color: "#6B7280",
     fontSize: 16,
     fontWeight: "600",
   },

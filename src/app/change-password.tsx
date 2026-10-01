@@ -1,21 +1,23 @@
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
+  const { isDarkMode } = useTheme();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPasswprd, setNewPassword] = useState("");
@@ -115,7 +117,7 @@ export default function ChangePasswordScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: "transparent" }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
@@ -123,27 +125,59 @@ export default function ChangePasswordScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.iconContainer}>
+        <View
+          style={[
+            styles.iconContainer,
+            { backgroundColor: isDarkMode ? "#1F2937" : "#EFF6FF" },
+          ]}
+        >
           <Ionicons name="lock-closed-outline" size={45} color="#2563EB" />
         </View>
 
-        <Text style={styles.title}>Update Your Password</Text>
+        <Text
+          style={[styles.title, { color: isDarkMode ? "#F9FAFB" : "#111827" }]}
+        >
+          Update Your Password
+        </Text>
 
-        <Text style={styles.description}>
+        <Text
+          style={[
+            styles.description,
+            { color: isDarkMode ? "#D1D5DB" : "#6B7280" },
+          ]}
+        >
           Enter your current password and choose a new password to secure your
           account.
         </Text>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Current Password</Text>
+          <Text
+            style={[
+              styles.label,
+              { color: isDarkMode ? "#E5E7EB" : "#374151" },
+            ]}
+          >
+            Current Password
+          </Text>
 
-          <View style={styles.inputContainer}>
+          <View
+            style={[
+              styles.inputContainer,
+              {
+                backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+                borderColor: isDarkMode ? "#374151" : "#D1D5DB",
+              },
+            ]}
+          >
             <Ionicons name="lock-closed-outline" size={20} color="#6B7280" />
 
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                { color: isDarkMode ? "#F9FAFB" : "#111827" },
+              ]}
               placeholder="Enter current password"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={isDarkMode ? "#9CA3AF" : "#9CA3AF"}
               value={currentPassword}
               onChangeText={setCurrentPassword}
               secureTextEntry={!showCurrentPassword}
@@ -163,15 +197,33 @@ export default function ChangePasswordScreen() {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>New Password</Text>
+          <Text
+            style={[
+              styles.label,
+              { color: isDarkMode ? "#E5E7EB" : "#374151" },
+            ]}
+          >
+            New Password
+          </Text>
 
-          <View style={styles.inputContainer}>
+          <View
+            style={[
+              styles.inputContainer,
+              {
+                backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+                borderColor: isDarkMode ? "#374151" : "#D1D5DB",
+              },
+            ]}
+          >
             <Ionicons name="lock-open-outline" size={20} color="#6B7280" />
 
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                { color: isDarkMode ? "#F9FAFB" : "#111827" },
+              ]}
               placeholder="Enter new password"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={isDarkMode ? "#9CA3AF" : "#9CA3AF"}
               value={newPasswprd}
               onChangeText={setNewPassword}
               secureTextEntry={!showNewPassword}
@@ -189,15 +241,35 @@ export default function ChangePasswordScreen() {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.helperText}>
+          <Text
+            style={[
+              styles.helperText,
+              { color: isDarkMode ? "#9CA3AF" : "#6B7280" },
+            ]}
+          >
             Password must contain at least 6 characters.
           </Text>
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Confirm New Password</Text>
+          <Text
+            style={[
+              styles.label,
+              { color: isDarkMode ? "#E5E7EB" : "#374151" },
+            ]}
+          >
+            Confirm New Password
+          </Text>
 
-          <View style={styles.inputContainer}>
+          <View
+            style={[
+              styles.inputContainer,
+              {
+                backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+                borderColor: isDarkMode ? "#374151" : "#D1D5DB",
+              },
+            ]}
+          >
             <Ionicons
               name="shield-checkmark-outline"
               size={20}
@@ -205,9 +277,12 @@ export default function ChangePasswordScreen() {
             />
 
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                { color: isDarkMode ? "#F9FAFB" : "#111827" },
+              ]}
               placeholder="Confirm new password"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={isDarkMode ? "#9CA3AF" : "#9CA3AF"}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry={!showConfirmPassword}
@@ -226,14 +301,26 @@ export default function ChangePasswordScreen() {
           </View>
         </View>
 
-        <View style={styles.infoBox}>
+        <View
+          style={[
+            styles.infoBox,
+            {
+              backgroundColor: isDarkMode ? "#1F2937" : "#EFF6FF",
+            },
+          ]}
+        >
           <Ionicons
             name="information-circle-outline"
             size={22}
             color="#2563EB"
           />
 
-          <Text style={styles.infoText}>
+          <Text
+            style={[
+              styles.infoText,
+              { color: isDarkMode ? "#D1D5DB" : "#374151" },
+            ]}
+          >
             After chnaging your password, you will be logged out and need to
             login agian using your new password.
           </Text>
@@ -258,7 +345,6 @@ export default function ChangePasswordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
   },
 
   backButton: {
@@ -271,7 +357,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#111827",
   },
 
   headerSpace: {
@@ -287,7 +372,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#EFF6FF",
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
@@ -298,13 +382,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#111827",
     textAlign: "center",
   },
 
   description: {
     fontSize: 14,
-    color: "#6B7280",
     lineHeight: 21,
     textAlign: "center",
     marginTop: 8,
@@ -318,7 +400,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#374151",
     marginBottom: 8,
   },
 
@@ -326,9 +407,7 @@ const styles = StyleSheet.create({
     height: 52,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#D1D5DB",
     borderRadius: 12,
     paddingHorizontal: 14,
   },
@@ -336,20 +415,17 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 15,
-    color: "#111827",
     marginLeft: 10,
     paddingVertical: 0,
   },
 
   helperText: {
     fontSize: 12,
-    color: "#6B7280",
     marginTop: 6,
   },
 
   infoBox: {
     flexDirection: "row",
-    backgroundColor: "#EFF6FF",
     borderRadius: 12,
     padding: 14,
     marginTop: 5,
@@ -360,7 +436,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     lineHeight: 19,
-    color: "#374151",
     marginLeft: 10,
   },
 

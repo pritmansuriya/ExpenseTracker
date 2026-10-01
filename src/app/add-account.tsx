@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -45,6 +46,7 @@ const accountTypes: {
 
 export default function AddAccountScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
 
   const [name, setName] = useState("");
   const [balance, setBalance] = useState("");
@@ -106,35 +108,51 @@ export default function AddAccountScreen() {
             onPress={() => router.back()}
             style={styles.backButton}
           >
-            <Ionicons name="arrow-back" size={24} color="#111827" />
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
 
-          <Text style={styles.headerTitle}>Add Account</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            Add Account
+          </Text>
 
           <View style={styles.headerSpace} />
         </View>
 
         {/* Account Name */}
-        <Text style={styles.label}>Account Name</Text>
+        <Text style={[styles.label, { color: colors.text }]}>Account Name</Text>
 
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              color: colors.text,
+            },
+          ]}
           placeholder="e.g. HDFC Bank"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={colors.textSecondary}
           value={name}
           onChangeText={setName}
         />
 
         {/* Balance */}
-        <Text style={styles.label}>Current Balance</Text>
+        <Text style={[styles.label, { color: colors.text }]}>
+          Current Balance
+        </Text>
 
-        <View style={styles.amountInput}>
+        <View
+          style={[
+            styles.amountInput,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
           <Text style={styles.currency}>₹</Text>
 
           <TextInput
-            style={styles.amountTextInput}
+            style={[styles.amountTextInput, { color: colors.text }]}
             placeholder="0"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textSecondary}
             keyboardType="numeric"
             value={balance}
             onChangeText={setBalance}
@@ -142,7 +160,7 @@ export default function AddAccountScreen() {
         </View>
 
         {/* Account Type */}
-        <Text style={styles.label}>Account Type</Text>
+        <Text style={[styles.label, { color: colors.text }]}>Account Type</Text>
 
         <View style={styles.typeContainer}>
           {accountTypes.map((item) => {
@@ -153,6 +171,10 @@ export default function AddAccountScreen() {
                 key={item.type}
                 style={[
                   styles.typeButton,
+                  {
+                    backgroundColor: colors.card,
+                    borderColor: colors.cardBorder,
+                  },
                   selected && styles.selectedTypeButton,
                 ]}
                 onPress={() => setType(item.type)}
@@ -160,11 +182,15 @@ export default function AddAccountScreen() {
                 <Ionicons
                   name={item.icon}
                   size={24}
-                  color={selected ? "#FFFFFF" : "#2563EB"}
+                  color={selected ? "#FFFFFF" : colors.primary}
                 />
 
                 <Text
-                  style={[styles.typeText, selected && styles.selectedTypeText]}
+                  style={[
+                    styles.typeText,
+                    { color: colors.textSecondary },
+                    selected && styles.selectedTypeText,
+                  ]}
                 >
                   {item.label}
                 </Text>
@@ -187,7 +213,7 @@ export default function AddAccountScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "transparent",
   },
 
   content: {

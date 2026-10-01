@@ -1,4 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTheme } from "@/context/ThemeContext";
+import { deleteSavingsGoal, getSavingsGoals } from "@/services/savingsApi";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -19,31 +20,17 @@ type SavingsGoal = {
 };
 
 export default function SavingsGoalScreen() {
+  const { isDarkMode } = useTheme();
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
 
-  // Load goals from AsyncStorage
+  // Load goals whenever this screen becomes active.
   const loadGoals = async () => {
     try {
-      const data = await AsyncStorage.getItem("savingsGoals");
-
-      console.log("Savings goals from storage:", data);
-
-      if (data) {
-        const parsedGoals = JSON.parse(data);
-
-        console.log("Parsed goals:", parsedGoals);
-
-        if (Array.isArray(parsedGoals)) {
-          setGoals(parsedGoals);
-        } else {
-          setGoals([]);
-        }
-      } else {
-        setGoals([]);
-      }
+      const data = await getSavingsGoals();
+      setGoals(data);
     } catch (error) {
       console.log("Error loading savings goals:", error);
-      setGoals([]);
+      Alert.alert("Error", "Failed to load savings goals. Please try again.");
     }
   };
   // Reload whenever this screen becomes active
@@ -63,26 +50,47 @@ export default function SavingsGoalScreen() {
       {
         text: "Delete",
         style: "destructive",
-        onPress: () => {
-          setGoals((currentGoals) =>
-            currentGoals.filter((goal) => goal.id !== id),
-          );
+        onPress: async () => {
+          try {
+            await deleteSavingsGoal(id);
+            setGoals((currentGoals) =>
+              currentGoals.filter((goal) => goal.id !== id),
+            );
+          } catch (error) {
+            console.log("Error deleting savings goal:", error);
+            Alert.alert("Error", "Unable to delete the savings goal.");
+          }
         },
       },
     ]);
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Header */}
+    <ScrollView
+      style={[styles.container, { backgroundColor: "transparent" }]}
+      contentContainerStyle={styles.content}
+    >
       <View style={styles.header}>
         <View>
-          <Text style={styles.heading}>Savings Goals</Text>
+          <Text
+            style={[
+              styles.heading,
+              { color: isDarkMode ? "#F9FAFB" : "#111827" },
+            ]}
+          >
+            Savings Goals
+          </Text>
 
-          <Text style={styles.subtitle}>Save money for your future</Text>
+          <Text
+            style={[
+              styles.subtitle,
+              { color: isDarkMode ? "#D1D5DB" : "#6B7280" },
+            ]}
+          >
+            Save money for your future
+          </Text>
         </View>
 
-        {/* Create Goal Button */}
         <TouchableOpacity
           style={styles.createButton}
           onPress={() => router.push("/add-savings-goals")}
@@ -91,14 +99,25 @@ export default function SavingsGoalScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* No Goals */}
       {goals.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyIcon}>🎯</Text>
 
-          <Text style={styles.emptyTitle}>No Savings Goals</Text>
+          <Text
+            style={[
+              styles.emptyTitle,
+              { color: isDarkMode ? "#F9FAFB" : "#111827" },
+            ]}
+          >
+            No Savings Goals
+          </Text>
 
-          <Text style={styles.emptyText}>
+          <Text
+            style={[
+              styles.emptyText,
+              { color: isDarkMode ? "#D1D5DB" : "#6B7280" },
+            ]}
+          >
             Create your first savings goal to start tracking your progress.
           </Text>
 
@@ -111,12 +130,15 @@ export default function SavingsGoalScreen() {
         </View>
       ) : (
         <>
-          {/* Goals Count */}
-          <Text style={styles.goalCount}>
+          <Text
+            style={[
+              styles.goalCount,
+              { color: isDarkMode ? "#E5E7EB" : "#374151" },
+            ]}
+          >
             {goals.length} {goals.length === 1 ? "Goal" : "Goals"}
           </Text>
 
-          {/* Goal Cards */}
           {goals.map((goal) => {
             const progress =
               goal.targetAmount > 0
@@ -126,18 +148,40 @@ export default function SavingsGoalScreen() {
             const remaining = Math.max(goal.targetAmount - goal.savedAmount, 0);
 
             return (
-              <View key={goal.id} style={styles.goalCard}>
-                {/* Goal Header */}
+              <View
+                key={goal.id}
+                style={[
+                  styles.goalCard,
+                  { backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF" },
+                ]}
+              >
                 <View style={styles.goalHeader}>
                   <View style={styles.goalInfo}>
-                    <View style={styles.iconContainer}>
+                    <View
+                      style={[
+                        styles.iconContainer,
+                        { backgroundColor: isDarkMode ? "#0F172A" : "#EFF6FF" },
+                      ]}
+                    >
                       <Text style={styles.icon}>🎯</Text>
                     </View>
 
                     <View style={styles.titleContainer}>
-                      <Text style={styles.goalName}>{goal.name}</Text>
+                      <Text
+                        style={[
+                          styles.goalName,
+                          { color: isDarkMode ? "#F9FAFB" : "#111827" },
+                        ]}
+                      >
+                        {goal.name}
+                      </Text>
 
-                      <Text style={styles.savedAmount}>
+                      <Text
+                        style={[
+                          styles.savedAmount,
+                          { color: isDarkMode ? "#D1D5DB" : "#6B7280" },
+                        ]}
+                      >
                         ₹{goal.savedAmount.toLocaleString("en-IN")}
                         {" / "}₹{goal.targetAmount.toLocaleString("en-IN")}
                       </Text>
@@ -149,8 +193,12 @@ export default function SavingsGoalScreen() {
                   </TouchableOpacity>
                 </View>
 
-                {/* Progress Bar */}
-                <View style={styles.progressBackground}>
+                <View
+                  style={[
+                    styles.progressBackground,
+                    { backgroundColor: isDarkMode ? "#374151" : "#E5E7EB" },
+                  ]}
+                >
                   <View
                     style={[
                       styles.progressBar,
@@ -161,21 +209,38 @@ export default function SavingsGoalScreen() {
                   />
                 </View>
 
-                {/* Percentage */}
                 <Text style={styles.percentage}>{Math.round(progress)}%</Text>
 
-                {/* Goal Details */}
                 <View style={styles.details}>
                   <View>
-                    <Text style={styles.detailLabel}>Target</Text>
+                    <Text
+                      style={[
+                        styles.detailLabel,
+                        { color: isDarkMode ? "#9CA3AF" : "#9CA3AF" },
+                      ]}
+                    >
+                      Target
+                    </Text>
 
-                    <Text style={styles.detailValue}>
+                    <Text
+                      style={[
+                        styles.detailValue,
+                        { color: isDarkMode ? "#F9FAFB" : "#111827" },
+                      ]}
+                    >
                       ₹{goal.targetAmount.toLocaleString("en-IN")}
                     </Text>
                   </View>
 
                   <View style={styles.remaining}>
-                    <Text style={styles.detailLabel}>Remaining</Text>
+                    <Text
+                      style={[
+                        styles.detailLabel,
+                        { color: isDarkMode ? "#9CA3AF" : "#9CA3AF" },
+                      ]}
+                    >
+                      Remaining
+                    </Text>
 
                     <Text style={styles.remainingValue}>
                       ₹{remaining.toLocaleString("en-IN")}
@@ -183,10 +248,12 @@ export default function SavingsGoalScreen() {
                   </View>
                 </View>
 
-                {/* Add Money */}
                 {progress < 100 && (
                   <TouchableOpacity
-                    style={styles.addMoneyButton}
+                    style={[
+                      styles.addMoneyButton,
+                      { backgroundColor: isDarkMode ? "#0F172A" : "#EFF6FF" },
+                    ]}
                     onPress={() =>
                       router.push({
                         pathname: "/add-money",
@@ -196,14 +263,32 @@ export default function SavingsGoalScreen() {
                       })
                     }
                   >
-                    <Text style={styles.addMoneyText}>+ Add Money</Text>
+                    <Text
+                      style={[
+                        styles.addMoneyText,
+                        { color: isDarkMode ? "#BFDBFE" : "#2563EB" },
+                      ]}
+                    >
+                      + Add Money
+                    </Text>
                   </TouchableOpacity>
                 )}
 
-                {/* Completed */}
                 {progress >= 100 && (
-                  <View style={styles.completedBox}>
-                    <Text style={styles.completedText}>🎉 Goal Completed!</Text>
+                  <View
+                    style={[
+                      styles.completedBox,
+                      { backgroundColor: isDarkMode ? "#14532D" : "#DCFCE7" },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.completedText,
+                        { color: isDarkMode ? "#BBF7D0" : "#16A34A" },
+                      ]}
+                    >
+                      🎉 Goal Completed!
+                    </Text>
                   </View>
                 )}
               </View>

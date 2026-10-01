@@ -1,8 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { Appearance } from "react-native";
 
 export type ThemeColors = {
   background: string;
+  backgroundGradient: readonly [string, string, string];
+  backgroundPattern: string;
   card: string;
   cardBorder: string;
   text: string;
@@ -15,29 +18,33 @@ export type ThemeColors = {
 };
 
 export const lightColors: ThemeColors = {
-  background: "#F8FAFC",
+  background: "#F2F6F2",
+  backgroundGradient: ["#E7F2ED", "#F4F6F0", "#FFF0E7"],
+  backgroundPattern: "rgba(35, 91, 73, 0.07)",
   card: "#FFFFFF",
-  cardBorder: "#E2E8F0",
-  text: "#0F172A",
-  textSecondary: "#64748B",
+  cardBorder: "#DCE8E1",
+  text: "#14231F",
+  textSecondary: "#64756D",
   primary: "#2563EB",
-  border: "#E2E8F0",
-  divider: "#F1F5F9",
+  border: "#DCE8E1",
+  divider: "#EAF0EB",
   tabBar: "#FFFFFF",
   tabBarBorder: "#E5E7EB",
 };
 
 export const darkColors: ThemeColors = {
-  background: "#111827",
-  card: "#1F2937",
-  cardBorder: "#374151",
-  text: "#F9FAFB",
-  textSecondary: "#9CA3AF",
+  background: "#111D1A",
+  backgroundGradient: ["#10231F", "#14262A", "#211F1C"],
+  backgroundPattern: "rgba(196, 225, 213, 0.055)",
+  card: "#1B2926",
+  cardBorder: "#34443F",
+  text: "#F4F7F2",
+  textSecondary: "#A5B4AC",
   primary: "#3B82F6",
-  border: "#374151",
-  divider: "#374151",
-  tabBar: "#1F2937",
-  tabBarBorder: "#374151",
+  border: "#34443F",
+  divider: "#2B3A35",
+  tabBar: "#1B2926",
+  tabBarBorder: "#34443F",
 };
 
 type ThemeContextType = {
@@ -68,16 +75,20 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     loadTheme();
   }, []);
 
+  useEffect(() => {
+    Appearance.setColorScheme(isDarkMode ? "dark" : "light");
+  }, [isDarkMode]);
+
   const toggleDarkMode = async () => {
-    const newValue = !isDarkMode;
+    setIsDarkMode((prev) => {
+      const nextValue = !prev;
 
-    setIsDarkMode(newValue);
+      AsyncStorage.setItem(THEME_KEY, String(nextValue)).catch((error) => {
+        console.log("Error saving theme:", error);
+      });
 
-    try {
-      await AsyncStorage.setItem(THEME_KEY, String(newValue));
-    } catch (error) {
-      console.log("Error saving theme:", error);
-    }
+      return nextValue;
+    });
   };
 
   const colors = isDarkMode ? darkColors : lightColors;

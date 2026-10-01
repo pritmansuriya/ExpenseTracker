@@ -1,17 +1,19 @@
+import { useTheme } from "@/context/ThemeContext";
 import { addSavingsGoal } from "@/services/savingsApi";
 import { addNotification } from "@/utils/notificationStorage";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
-    Alert,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function AddSavingsGoal() {
+  const { colors } = useTheme();
   const [name, setName] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
   const [loading, setLoading] = useState(false);
@@ -63,23 +65,41 @@ export default function AddSavingsGoal() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Create Savings Goal</Text>
+    <View style={[styles.container, { backgroundColor: "transparent" }]}>
+      <Text style={[styles.heading, { color: colors.text }]}>
+        Create Savings Goal
+      </Text>
 
-      <Text style={styles.label}>Goal Name</Text>
+      <Text style={[styles.label, { color: colors.text }]}>Goal Name</Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            color: colors.text,
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
         placeholder="e.g. New Laptop"
         placeholderTextColor="#9CA3AF"
         value={name}
         onChangeText={setName}
       />
 
-      <Text style={styles.label}>Target Amount (₹)</Text>
+      <Text style={[styles.label, { color: colors.text }]}>
+        Target Amount (₹)
+      </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            color: colors.text,
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
         placeholder="e.g. 60000"
         placeholderTextColor="#9CA3AF"
         keyboardType="numeric"
@@ -101,7 +121,9 @@ export default function AddSavingsGoal() {
         style={styles.cancelButton}
         onPress={() => router.back()}
       >
-        <Text style={styles.cancelText}>Cancel</Text>
+        <Text style={[styles.cancelText, { color: colors.textSecondary }]}>
+          Cancel
+        </Text>
       </TouchableOpacity>
     </View>
   );

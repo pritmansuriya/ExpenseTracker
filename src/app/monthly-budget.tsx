@@ -1,17 +1,19 @@
+import { useTheme } from "@/context/ThemeContext";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-    Alert,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { getBudget, saveBudget } from "@/utils/budgetStorage";
 
 export default function MonthlyBudgetScreen() {
+  const { colors } = useTheme();
   const [budget, setBudget] = useState(0);
   const [amount, setAmount] = useState("");
 
@@ -24,7 +26,6 @@ export default function MonthlyBudgetScreen() {
     } catch (error) {
       console.log("Error loading budget:", error);
     }
-    ``;
   };
 
   useFocusEffect(
@@ -53,21 +54,40 @@ export default function MonthlyBudgetScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Monthly Budget</Text>
+      <Text style={[styles.title, { color: colors.text }]}>Monthly Budget</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>Current Budget</Text>
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: colors.card, borderColor: colors.cardBorder },
+        ]}
+      >
+        <Text style={[styles.label, { color: colors.textSecondary }]}>
+          Current Budget
+        </Text>
 
-        <Text style={styles.amount}>₹{budget.toLocaleString("en-IN")}</Text>
+        <Text style={[styles.amount, { color: colors.primary }]}>
+          ₹{budget.toLocaleString("en-IN")}
+        </Text>
       </View>
 
-      <Text style={styles.inputLabel}>Set Monthly Budget</Text>
+      <Text style={[styles.inputLabel, { color: colors.text }]}>
+        Set Monthly Budget
+      </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+            color: colors.text,
+          },
+        ]}
         value={amount}
         onChangeText={setAmount}
         placeholder="Enter budget amount"
+        placeholderTextColor={colors.textSecondary}
         keyboardType="numeric"
       />
 
@@ -81,7 +101,7 @@ export default function MonthlyBudgetScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "transparent",
     padding: 20,
     paddingTop: 60,
   },
@@ -99,6 +119,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 25,
     elevation: 2,
+    borderWidth: 1,
   },
 
   label: {

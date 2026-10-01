@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -12,6 +13,7 @@ import {
 import { setAppLockPin } from "@/utils/appLockStorage";
 
 export default function AppLockScreen() {
+  const { isDarkMode } = useTheme();
   const [pin, setPin] = useState("");
   const [confirmPin, setConfirmPin] = useState("");
 
@@ -37,33 +39,61 @@ export default function AppLockScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: "transparent" }]}>
       <Text style={styles.icon}>🔒</Text>
 
-      <Text style={styles.title}>App Lock</Text>
+      <Text
+        style={[styles.title, { color: isDarkMode ? "#F9FAFB" : "#111827" }]}
+      >
+        App Lock
+      </Text>
 
-      <Text style={styles.label}>Enter PIN</Text>
+      <Text
+        style={[styles.label, { color: isDarkMode ? "#E5E7EB" : "#111827" }]}
+      >
+        Enter PIN
+      </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+            borderColor: isDarkMode ? "#374151" : "#D1D5D8",
+            color: isDarkMode ? "#F9FAFB" : "#111827",
+          },
+        ]}
         value={pin}
         onChangeText={setPin}
         keyboardType="number-pad"
         maxLength={4}
         secureTextEntry
         placeholder="* * * *"
+        placeholderTextColor={isDarkMode ? "#9CA3AF" : "#6B7280"}
       />
 
-      <Text style={styles.label}>Confirm PIN</Text>
+      <Text
+        style={[styles.label, { color: isDarkMode ? "#E5E7EB" : "#111827" }]}
+      >
+        Confirm PIN
+      </Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+            borderColor: isDarkMode ? "#374151" : "#D1D5D8",
+            color: isDarkMode ? "#F9FAFB" : "#111827",
+          },
+        ]}
         value={confirmPin}
         onChangeText={setConfirmPin}
         keyboardType="number-pad"
         maxLength={4}
         secureTextEntry
         placeholder="* * * *"
+        placeholderTextColor={isDarkMode ? "#9CA3AF" : "#6B7280"}
       />
 
       <TouchableOpacity style={styles.button} onPress={handleSavePin}>
@@ -78,7 +108,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: "center",
-    backgroundColor: "#F9FAFB",
   },
 
   icon: {
@@ -91,7 +120,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#111827",
   },
 
   subtitle: {
@@ -104,16 +132,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#111827",
     marginBottom: 8,
   },
 
   input: {
     height: 55,
     borderWidth: 1,
-    borderColor: "#D1D5D8",
     borderRadius: 12,
-    backgroundColor: "#FFFFFF",
     textAlign: "center",
     fontSize: 24,
     letterSpacing: 10,

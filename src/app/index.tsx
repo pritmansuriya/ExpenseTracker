@@ -5,32 +5,33 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 export default function Index() {
   useEffect(() => {
-    checkAppLock();
-  }, []);
+    let redirectTimer: ReturnType<typeof setTimeout> | undefined;
 
-  const checkAppLock = async () => {
-    try {
-      const pin = await AsyncStorage.getItem("appLockPin");
+    const checkAppLock = async () => {
+      try {
+        const pin = await AsyncStorage.getItem("appLockPin");
 
-      console.log("Saved App Lock PIN:", pin);
-
-      if (pin) {
-        console.log("PIN FOUND");
-        console.log("Going to Enter PIN...");
-
-        setTimeout(() => {
-          router.replace("/enter-pin");
-        }, 100);
-      } else {
-        console.log("No PIN found");
+        if (pin) {
+          redirectTimer = setTimeout(() => {
+            router.replace("/enter-pin");
+          }, 100);
+        } else {
+          router.replace("/(tabs)");
+        }
+      } catch (error) {
+        console.log("Error checking App Lock:", error);
         router.replace("/(tabs)");
       }
-    } catch (error) {
-      console.log("Error checking App Lock:", error);
+    };
 
-      router.replace("/(tabs)");
-    }
-  };
+    void checkAppLock();
+
+    return () => {
+      if (redirectTimer) {
+        clearTimeout(redirectTimer);
+      }
+    };
+  }, []);
 
   return (
     <View style={styles.container}>

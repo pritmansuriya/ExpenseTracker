@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS } from "../constants/colors";
 
@@ -9,10 +10,20 @@ type Props = {
 
 export default function SummaryCard({ title, amount, type }: Props) {
   const isIncome = type === "income";
+  const { isDarkMode } = useTheme();
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>{title}</Text>
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: isDarkMode ? "#1F2937" : COLORS.white },
+      ]}
+    >
+      <Text
+        style={[styles.title, { color: isDarkMode ? "#D1D5DB" : COLORS.gray }]}
+      >
+        {title}
+      </Text>
 
       <Text
         style={[

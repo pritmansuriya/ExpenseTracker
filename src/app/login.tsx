@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -11,6 +12,7 @@ import {
 } from "react-native";
 
 export default function LoginScreen() {
+  const { colors } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -54,19 +56,33 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.formContainer}>
+      <View
+        style={[
+          styles.formContainer,
+          { backgroundColor: colors.card, borderColor: colors.cardBorder },
+        ]}
+      >
         <Text style={styles.logo}>💰</Text>
 
-        <Text style={styles.title}>Welcome Back</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Welcome Back</Text>
 
-        <Text style={styles.subtitle}>Login to manage your expenses</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+          Login to manage your expenses
+        </Text>
 
-        <Text style={styles.label}>Email</Text>
+        <Text style={[styles.label, { color: colors.text }]}>Email</Text>
 
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.background,
+              borderColor: colors.border,
+              color: colors.text,
+            },
+          ]}
           placeholder="Enter your email"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={colors.textSecondary}
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -74,12 +90,19 @@ export default function LoginScreen() {
           autoCorrect={false}
         />
 
-        <Text style={styles.label}>Password</Text>
+        <Text style={[styles.label, { color: colors.text }]}>Password</Text>
 
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.background,
+              borderColor: colors.border,
+              color: colors.text,
+            },
+          ]}
           placeholder="Enter your password"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={colors.textSecondary}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -90,7 +113,9 @@ export default function LoginScreen() {
         </TouchableOpacity>
 
         <View style={styles.registerContainer}>
-          <Text style={styles.accountText}>Don't have an account?</Text>
+          <Text style={[styles.accountText, { color: colors.textSecondary }]}>
+            Don&apos;t have an account?
+          </Text>
 
           <TouchableOpacity onPress={() => router.push("/register")}>
             <Text style={styles.registerText}> Register</Text>
@@ -104,7 +129,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "transparent",
     justifyContent: "center",
     paddingHorizontal: 24,
   },
@@ -121,6 +146,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 10,
     elevation: 5,
+    borderWidth: 1,
   },
 
   logo: {

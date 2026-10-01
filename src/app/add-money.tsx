@@ -1,5 +1,6 @@
+import { useTheme } from "@/context/ThemeContext";
+import { addMoneyToGoal, getSavingsGoalById } from "@/services/savingsApi";
 import { addNotification } from "@/utils/notificationStorage";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -20,39 +21,31 @@ type SavingsGoal = {
 };
 
 export default function AddMoneyScreen() {
+  const { colors } = useTheme();
   const { goalId } = useLocalSearchParams<{ goalId: string }>();
   const [amount, setAmount] = useState("");
   const [goal, setGoal] = useState<SavingsGoal | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadGoal();
+    const loadGoal = async () => {
+      try {
+        const selectedGoal = await getSavingsGoalById(goalId);
+        if (!selectedGoal) {
+          Alert.alert("Error", "Savings goal not found");
+          setGoal(null);
+          return;
+        }
+
+        setGoal(selectedGoal);
+      } catch (error) {
+        console.log("Error loading goal:", error);
+        Alert.alert("Error", "Failed to load savings goal");
+      }
+    };
+
+    void loadGoal();
   }, [goalId]);
-  const loadGoal = async () => {
-    try {
-      const data = await AsyncStorage.getItem("savingsGoals");
-
-      if (!data) {
-        setGoal(null);
-        return;
-      }
-
-      const goals: SavingsGoal[] = JSON.parse(data);
-
-      const selectedGoal = goals.find((item) => item.id === goalId);
-
-      if (!selectedGoal) {
-        Alert.alert("Error", "Savings goal not found");
-        setGoal(null);
-        return;
-      }
-
-      setGoal(selectedGoal);
-    } catch (error) {
-      console.log("Error loading goal:", error);
-      Alert.alert("Error", "Failed to load savings goal");
-    }
-  };
 
   const handleAddMoney = async () => {
     if (!amount.trim()) {
@@ -108,33 +101,8 @@ export default function AddMoneyScreen() {
     setLoading(true);
 
     try {
-      const data = await AsyncStorage.getItem("savingsGoals");
-
-      if (!data) {
-        Alert.alert("Error", "No savings goals found");
-        return;
-      }
-
-      const goals: SavingsGoal[] = JSON.parse(data);
-
-      const updatedGoals = goals.map((item) => {
-        if (item.id === goal.id) {
-          return {
-            ...item,
-            savedAmount: item.savedAmount + numericAmount,
-          };
-        }
-
-        return item;
-      });
-
-      await AsyncStorage.setItem("savingsGoals", JSON.stringify(updatedGoals));
-
-      const updatedGoal = updatedGoals.find((item) => item.id === goal.id);
-
-      if (updatedGoal) {
-        setGoal(updatedGoal);
-      }
+      const updatedGoal = await addMoneyToGoal(goal.id, numericAmount);
+      setGoal(updatedGoal);
 
       await addNotification({
         id: Date.now().toString(),
@@ -174,39 +142,67 @@ export default function AddMoneyScreen() {
     : 0;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: "transparent" }]}>
       {/* Header */}
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
 
-      <Text style={styles.heading}>Add Money</Text>
+      <Text style={[styles.heading, { color: colors.text }]}>Add Money</Text>
 
       {goal ? (
         <>
           {/* Goal Info */}
-          <View style={styles.goalCard}>
+          <View
+            style={[
+              styles.goalCard,
+              { backgroundColor: colors.card, borderColor: colors.cardBorder },
+            ]}
+          >
             <Text style={styles.goalIcon}>🎯</Text>
 
-            <Text style={styles.goalName}>{goal.name}</Text>
+            <Text style={[styles.goalName, { color: colors.text }]}>
+              {goal.name}
+            </Text>
 
             <View style={styles.goalRow}>
               <View style={styles.goalStat}>
-                <Text style={styles.goalStatLabel}>Saved</Text>
+                <Text
+                  style={[
+                    styles.goalStatLabel,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  Saved
+                </Text>
                 <Text style={[styles.goalStatValue, { color: "#16A34A" }]}>
                   ₹{goal.savedAmount.toLocaleString("en-IN")}
                 </Text>
               </View>
 
               <View style={styles.goalStat}>
-                <Text style={styles.goalStatLabel}>Target</Text>
-                <Text style={styles.goalStatValue}>
+                <Text
+                  style={[
+                    styles.goalStatLabel,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  Target
+                </Text>
+                <Text style={[styles.goalStatValue, { color: colors.text }]}>
                   ₹{goal.targetAmount.toLocaleString("en-IN")}
                 </Text>
               </View>
 
               <View style={styles.goalStat}>
-                <Text style={styles.goalStatLabel}>Remaining</Text>
+                <Text
+                  style={[
+                    styles.goalStatLabel,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  Remaining
+                </Text>
                 <Text style={[styles.goalStatValue, { color: "#DC2626" }]}>
                   ₹{remaining.toLocaleString("en-IN")}
                 </Text>
@@ -214,7 +210,12 @@ export default function AddMoneyScreen() {
             </View>
 
             {/* Progress Bar */}
-            <View style={styles.progressBackground}>
+            <View
+              style={[
+                styles.progressBackground,
+                { backgroundColor: colors.border },
+              ]}
+            >
               <View
                 style={[
                   styles.progressBar,
@@ -225,7 +226,9 @@ export default function AddMoneyScreen() {
               />
             </View>
 
-            <Text style={styles.progressText}>
+            <Text
+              style={[styles.progressText, { color: colors.textSecondary }]}
+            >
               {Math.round(
                 Math.min((goal.savedAmount / goal.targetAmount) * 100, 100),
               )}
@@ -234,10 +237,19 @@ export default function AddMoneyScreen() {
           </View>
 
           {/* Amount Input */}
-          <Text style={styles.label}>Amount to Add (₹)</Text>
+          <Text style={[styles.label, { color: colors.text }]}>
+            Amount to Add (₹)
+          </Text>
 
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                color: colors.text,
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
             placeholder="Enter amount"
             keyboardType="numeric"
             value={amount}
@@ -258,7 +270,9 @@ export default function AddMoneyScreen() {
         </>
       ) : (
         <View style={styles.notFound}>
-          <Text style={styles.notFoundText}>Loading goal...</Text>
+          <Text style={[styles.notFoundText, { color: colors.textSecondary }]}>
+            Loading goal...
+          </Text>
         </View>
       )}
     </View>

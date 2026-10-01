@@ -1,13 +1,14 @@
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-  Alert,
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    FlatList,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { Account } from "@/types/account";
@@ -15,6 +16,7 @@ import { deleteAccount, getAccounts } from "@/utils/accountStorage";
 
 export default function AccountsScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
 
   const [accounts, setAccounts] = useState<Account[]>([]);
 
@@ -96,7 +98,10 @@ export default function AccountsScreen() {
   const renderAccount = ({ item }: { item: Account }) => {
     return (
       <TouchableOpacity
-        style={styles.accountCard}
+        style={[
+          styles.accountCard,
+          { backgroundColor: colors.card, borderColor: colors.cardBorder },
+        ]}
         onPress={() =>
           router.push({
             pathname: "/edit-account",
@@ -123,9 +128,13 @@ export default function AccountsScreen() {
         </View>
 
         <View style={styles.accountInfo}>
-          <Text style={styles.accountName}>{item.name}</Text>
+          <Text style={[styles.accountName, { color: colors.text }]}>
+            {item.name}
+          </Text>
 
-          <Text style={styles.accountType}>{item.type.toUpperCase()}</Text>
+          <Text style={[styles.accountType, { color: colors.textSecondary }]}>
+            {item.type.toUpperCase()}
+          </Text>
         </View>
 
         <Text
@@ -141,12 +150,16 @@ export default function AccountsScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: "transparent" }]}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>My Accounts</Text>
+          <Text style={[styles.title, { color: colors.text }]}>
+            My Accounts
+          </Text>
 
-          <Text style={styles.subtitle}>Manage your money</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+            Manage your money
+          </Text>
         </View>
 
         <TouchableOpacity
@@ -175,7 +188,9 @@ export default function AccountsScreen() {
           <View style={styles.empty}>
             <Ionicons name="wallet-outline" size={55} color="#9CA3AF" />
 
-            <Text style={styles.emptyText}>No accounts found</Text>
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+              No accounts found
+            </Text>
           </View>
         }
       />
@@ -252,6 +267,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 12,
     elevation: 2,
+    borderWidth: 1,
   },
 
   iconContainer: {

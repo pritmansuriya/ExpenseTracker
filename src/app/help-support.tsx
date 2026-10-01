@@ -1,78 +1,115 @@
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function HelpSupportScreen() {
-  const router = useRouter();
+  const { colors } = useTheme();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: "transparent" }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.iconContainer}>
           <Ionicons name="help-circle" size={55} color="#2563EB" />
         </View>
 
-        <Text style={styles.title}>How can we hwlp?</Text>
+        <Text style={[styles.title, { color: colors.text }]}>
+          How can we hwlp?
+        </Text>
 
-        <Text style={styles.description}>
+        <Text style={[styles.description, { color: colors.textSecondary }]}>
           Find answer to common questions and get help using the Expense Tracker
           applicaion.
         </Text>
 
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: colors.card, borderColor: colors.cardBorder },
+          ]}
+        >
           <Ionicons name="wallet-outline" size={28} color="#2563EB" />
 
           <View style={styles.cardContent}>
-            <Text style={styles.cardTitle}>Managing Transactions</Text>
-            <Text style={styles.cardText}>
+            <Text style={[styles.cardTitle, { color: colors.text }]}>
+              Managing Transactions
+            </Text>
+            <Text style={[styles.cardText, { color: colors.textSecondary }]}>
               Add income and expenses, edit your transactions, and remove
               transactions you no longer need.
             </Text>
           </View>
         </View>
 
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: colors.card, borderColor: colors.cardBorder },
+          ]}
+        >
           <Ionicons name="trending-up-outline" size={28} color="#2563EB" />
 
           <View style={styles.cardContent}>
-            <Text style={styles.cardTitle}>Savings Goals</Text>
-            <Text style={styles.cardText}>
+            <Text style={[styles.cardTitle, { color: colors.text }]}>
+              Savings Goals
+            </Text>
+            <Text style={[styles.cardText, { color: colors.textSecondary }]}>
               Create savings goals and track how much money you have saved
               toward each goal.
             </Text>
           </View>
         </View>
 
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: colors.card, borderColor: colors.cardBorder },
+          ]}
+        >
           <Ionicons name="card-outline" size={28} color="#2563EB" />
 
           <View style={styles.cardContent}>
-            <Text style={styles.cardTitle}>Accounts</Text>
-            <Text style={styles.cardText}>
+            <Text style={[styles.cardTitle, { color: colors.text }]}>
+              Accounts
+            </Text>
+            <Text style={[styles.cardText, { color: colors.textSecondary }]}>
               Manage your cash, bank accounts, UPI accounts, and credit cards
               from the Accounts section.
             </Text>
           </View>
         </View>
 
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: colors.card, borderColor: colors.cardBorder },
+          ]}
+        >
           <Ionicons name="notifications-outline" size={28} color="#2563EB" />
 
           <View style={styles.cardContent}>
-            <Text style={styles.cardTitle}>Notifications</Text>
-            <Text style={styles.cardText}>
+            <Text style={[styles.cardTitle, { color: colors.text }]}>
+              Notifications
+            </Text>
+            <Text style={[styles.cardText, { color: colors.textSecondary }]}>
               Check reminders and important notifications related to your
               expenses, budgets, and savings.
             </Text>
           </View>
         </View>
 
-        <View style={styles.contactBox}>
+        <View
+          style={[
+            styles.contactBox,
+            { backgroundColor: colors.card, borderColor: colors.cardBorder },
+          ]}
+        >
           <Ionicons name="mail-outline" size={30} color="#2563EB" />
 
-          <Text style={styles.contactTitle}>Need more help?</Text>
+          <Text style={[styles.contactTitle, { color: colors.text }]}>
+            Need more help?
+          </Text>
 
-          <Text style={styles.contactText}>
+          <Text style={[styles.contactText, { color: colors.textSecondary }]}>
             If you have any problems while using the application, please contact
             our support team.
           </Text>
@@ -167,6 +204,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     marginTop: 10,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
 
   contactTitle: {

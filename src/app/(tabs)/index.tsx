@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
@@ -27,6 +28,7 @@ type Transaction = {
 };
 
 export default function HomeScreen() {
+  const { isDarkMode } = useTheme();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
@@ -110,11 +112,21 @@ export default function HomeScreen() {
   const recentTransactions = transactions.slice(0, 5);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: "transparent" }]}
+      contentContainerStyle={styles.content}
+    >
       <View style={styles.authHeader}>
         {isLoggedIn ? (
           <>
-            <Text style={styles.userName}>Hello, {userName || "User"} 👋</Text>
+            <Text
+              style={[
+                styles.userName,
+                { color: isDarkMode ? "#F9FAFB" : COLORS.black },
+              ]}
+            >
+              Hello, {userName || "User"} 👋
+            </Text>
 
             <TouchableOpacity
               style={styles.logoutButton}
@@ -141,9 +153,23 @@ export default function HomeScreen() {
           </View>
         )}
       </View>
-      <Text style={styles.greeting}>Good Morning 👋</Text>
+      <Text
+        style={[
+          styles.greeting,
+          { color: isDarkMode ? "#F9FAFB" : COLORS.black },
+        ]}
+      >
+        Good Morning 👋
+      </Text>
 
-      <Text style={styles.subtitle}>Manage your finances</Text>
+      <Text
+        style={[
+          styles.subtitle,
+          { color: isDarkMode ? "#D1D5DB" : COLORS.gray },
+        ]}
+      >
+        Manage your finances
+      </Text>
 
       <BalanceCard balance={balance} />
 
@@ -154,7 +180,14 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Recent Transactions</Text>
+        <Text
+          style={[
+            styles.sectionTitle,
+            { color: isDarkMode ? "#F9FAFB" : COLORS.black },
+          ]}
+        >
+          Recent Transactions
+        </Text>
 
         <TouchableOpacity onPress={() => router.push("/(tabs)/transactions")}>
           <Text style={styles.seeAll}>See All</Text>
@@ -162,7 +195,14 @@ export default function HomeScreen() {
       </View>
 
       {recentTransactions.length === 0 ? (
-        <Text style={styles.emptyText}>No transactions yet</Text>
+        <Text
+          style={[
+            styles.emptyText,
+            { color: isDarkMode ? "#D1D5DB" : COLORS.gray },
+          ]}
+        >
+          No transactions yet
+        </Text>
       ) : (
         recentTransactions.map((transaction) => (
           <TransactionItem key={transaction.id} transaction={transaction} />

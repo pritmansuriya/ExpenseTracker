@@ -1,16 +1,17 @@
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { getAccounts, updateAccount } from "@/utils/accountStorage";
@@ -46,6 +47,7 @@ const accountTypes: {
 
 export default function EditAccountScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
 
   const { accountId } = useLocalSearchParams<{
     accountId: string;
@@ -60,38 +62,38 @@ export default function EditAccountScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadAccount();
-  }, [accountId]);
+    const loadAccount = async () => {
+      try {
+        const accounts = await getAccounts();
 
-  const loadAccount = async () => {
-    try {
-      const accounts = await getAccounts();
+        const foundAccount = accounts.find((item) => item.id === accountId);
 
-      const foundAccount = accounts.find((item) => item.id === accountId);
+        if (!foundAccount) {
+          Alert.alert("Error", "Account not found.", [
+            {
+              text: "OK",
+              onPress: () => router.back(),
+            },
+          ]);
 
-      if (!foundAccount) {
-        Alert.alert("Error", "Account not found.", [
-          {
-            text: "OK",
-            onPress: () => router.back(),
-          },
-        ]);
+          return;
+        }
 
-        return;
+        setAccount(foundAccount);
+        setName(foundAccount.name);
+        setBalance(foundAccount.balance.toString());
+        setType(foundAccount.type);
+      } catch (error) {
+        console.log("Error loading account:", error);
+
+        Alert.alert("Error", "Unable to load account.");
+      } finally {
+        setLoading(false);
       }
+    };
 
-      setAccount(foundAccount);
-      setName(foundAccount.name);
-      setBalance(foundAccount.balance.toString());
-      setType(foundAccount.type);
-    } catch (error) {
-      console.log("Error loading account:", error);
-
-      Alert.alert("Error", "Unable to load account.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    void loadAccount();
+  }, [accountId, router]);
 
   const handleUpdate = async () => {
     if (!account) {
@@ -139,8 +141,12 @@ export default function EditAccountScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Loading account...</Text>
+      <View
+        style={[styles.loadingContainer, { backgroundColor: "transparent" }]}
+      >
+        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+          Loading account...
+        </Text>
       </View>
     );
   }
@@ -151,7 +157,7 @@ export default function EditAccountScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: "transparent" }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
@@ -162,37 +168,56 @@ export default function EditAccountScreen() {
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => router.back()}
-            style={styles.backButton}
+            style={[
+              styles.backButton,
+              { backgroundColor: colors.card, borderColor: colors.cardBorder },
+            ]}
           >
-            <Ionicons name="arrow-back" size={24} color="#111827" />
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
 
-          <Text style={styles.headerTitle}>Edit Account</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            Edit Account
+          </Text>
 
           <View style={styles.headerSpace} />
         </View>
 
         {/* Account Name */}
-        <Text style={styles.label}>Account Name</Text>
+        <Text style={[styles.label, { color: colors.text }]}>Account Name</Text>
 
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              color: colors.text,
+            },
+          ]}
           placeholder="Account name"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={colors.textSecondary}
           value={name}
           onChangeText={setName}
         />
 
         {/* Balance */}
-        <Text style={styles.label}>Current Balance</Text>
+        <Text style={[styles.label, { color: colors.text }]}>
+          Current Balance
+        </Text>
 
-        <View style={styles.amountInput}>
+        <View
+          style={[
+            styles.amountInput,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
           <Text style={styles.currency}>₹</Text>
 
           <TextInput
-            style={styles.amountTextInput}
+            style={[styles.amountTextInput, { color: colors.text }]}
             placeholder="0"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textSecondary}
             keyboardType="numeric"
             value={balance}
             onChangeText={setBalance}
@@ -200,7 +225,7 @@ export default function EditAccountScreen() {
         </View>
 
         {/* Account Type */}
-        <Text style={styles.label}>Account Type</Text>
+        <Text style={[styles.label, { color: colors.text }]}>Account Type</Text>
 
         <View style={styles.typeContainer}>
           {accountTypes.map((item) => {
@@ -211,6 +236,10 @@ export default function EditAccountScreen() {
                 key={item.type}
                 style={[
                   styles.typeButton,
+                  {
+                    backgroundColor: colors.card,
+                    borderColor: colors.cardBorder,
+                  },
                   selected && styles.selectedTypeButton,
                 ]}
                 onPress={() => setType(item.type)}
@@ -218,11 +247,15 @@ export default function EditAccountScreen() {
                 <Ionicons
                   name={item.icon}
                   size={24}
-                  color={selected ? "#FFFFFF" : "#2563EB"}
+                  color={selected ? "#FFFFFF" : colors.primary}
                 />
 
                 <Text
-                  style={[styles.typeText, selected && styles.selectedTypeText]}
+                  style={[
+                    styles.typeText,
+                    { color: colors.textSecondary },
+                    selected && styles.selectedTypeText,
+                  ]}
                 >
                   {item.label}
                 </Text>

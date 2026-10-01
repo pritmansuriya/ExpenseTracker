@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -11,6 +12,7 @@ import {
 } from "react-native";
 
 export default function RegisterScreen() {
+  const { colors } = useTheme();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,13 +55,21 @@ export default function RegisterScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Create Account</Text>
+      <Text style={[styles.title, { color: colors.text }]}>Create Account</Text>
 
       <TextInput
         placeholder="Full Name"
         value={name}
         onChangeText={setName}
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+            color: colors.text,
+          },
+        ]}
+        placeholderTextColor={colors.textSecondary}
       />
 
       <TextInput
@@ -69,7 +79,15 @@ export default function RegisterScreen() {
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+            color: colors.text,
+          },
+        ]}
+        placeholderTextColor={colors.textSecondary}
       />
 
       <TextInput
@@ -77,7 +95,15 @@ export default function RegisterScreen() {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+            color: colors.text,
+          },
+        ]}
+        placeholderTextColor={colors.textSecondary}
       />
 
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
@@ -96,7 +122,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 25,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "transparent",
   },
 
   title: {
@@ -113,6 +139,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
+    fontSize: 16,
   },
 
   button: {

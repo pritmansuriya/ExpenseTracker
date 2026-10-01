@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -13,36 +14,37 @@ import {
 const PROFILE_KEY = "profile";
 
 export default function EditProfileScreen() {
+  const { colors } = useTheme();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
 
   useEffect(() => {
-    loadProfile();
-  }, []);
+    const loadProfile = async () => {
+      try {
+        const data = await AsyncStorage.getItem(PROFILE_KEY);
+        const userData = await AsyncStorage.getItem("user");
 
-  const loadProfile = async () => {
-    try {
-      const data = await AsyncStorage.getItem(PROFILE_KEY);
-      const userData = await AsyncStorage.getItem("user");
+        if (data) {
+          const profile = JSON.parse(data);
 
-      if (data) {
-        const profile = JSON.parse(data);
+          setName(profile.name || "");
+          setEmail(profile.email || "");
+          setPhone(profile.phone || "");
+        } else if (userData) {
+          const user = JSON.parse(userData);
 
-        setName(profile.name || "");
-        setEmail(profile.email || "");
-        setPhone(profile.phone || "");
-      } else if (userData) {
-        const user = JSON.parse(userData);
-
-        setName(user.name || "");
-        setEmail(user.email || "");
-        setPhone("+91 98765 43210");
+          setName(user.name || "");
+          setEmail(user.email || "");
+          setPhone("+91 98765 43210");
+        }
+      } catch (error) {
+        console.log("Error loading profile:", error);
       }
-    } catch (error) {
-      console.log("Error loading profile:", error);
-    }
-  };
+    };
+
+    void loadProfile();
+  }, []);
 
   const handleSave = async () => {
     if (!name.trim() || !email.trim()) {
@@ -86,36 +88,60 @@ export default function EditProfileScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Edit Profile</Text>
+    <View style={[styles.container, { backgroundColor: "transparent" }]}>
+      <Text style={[styles.heading, { color: colors.text }]}>Edit Profile</Text>
 
-      <Text style={styles.label}>Name</Text>
+      <Text style={[styles.label, { color: colors.text }]}>Name</Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            color: colors.text,
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
         value={name}
         onChangeText={setName}
         placeholder="Enter your name"
+        placeholderTextColor={colors.textSecondary}
       />
 
-      <Text style={styles.label}>Email</Text>
+      <Text style={[styles.label, { color: colors.text }]}>Email</Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            color: colors.text,
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
         value={email}
         onChangeText={setEmail}
         placeholder="Enter your email"
+        placeholderTextColor={colors.textSecondary}
         keyboardType="email-address"
         autoCapitalize="none"
       />
 
-      <Text style={styles.label}>Phone</Text>
+      <Text style={[styles.label, { color: colors.text }]}>Phone</Text>
 
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            color: colors.text,
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
         value={phone}
         onChangeText={setPhone}
         placeholder="Enter your phone number"
+        placeholderTextColor={colors.textSecondary}
         keyboardType="phone-pad"
       />
 

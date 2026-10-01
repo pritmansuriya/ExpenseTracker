@@ -4,14 +4,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-  Alert,
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  View,
+    Alert,
+    Image,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -98,7 +98,7 @@ export default function ProfileScreen() {
       style={[
         styles.container,
         {
-          backgroundColor: isDarkMode ? "#111827" : "#F8FAFC",
+          backgroundColor: "transparent",
         },
       ]}
     >
@@ -200,7 +200,14 @@ export default function ProfileScreen() {
         {/* Expense Settings */}
         <SectionTitle title="Expense Settings" />
 
-        <View style={styles.section}>
+        <View
+          style={[
+            styles.section,
+            {
+              backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+            },
+          ]}
+        >
           <MenuItem
             icon="cash-outline"
             title="Default Currency"
@@ -233,14 +240,21 @@ export default function ProfileScreen() {
         {/* Appearance */}
         <SectionTitle title="Appearance" />
 
-        <View style={styles.section}>
+        <View
+          style={[
+            styles.section,
+            {
+              backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+            },
+          ]}
+        >
           <MenuItem
             icon="moon-outline"
             title="Dark Mode"
             rightComponent={
               <Switch
                 value={isDarkMode}
-                onValueChange={toggleDarkMode}
+                onValueChange={() => toggleDarkMode()}
                 trackColor={{
                   false: "#CBD5E1",
                   true: "#93C5FD",
@@ -261,7 +275,14 @@ export default function ProfileScreen() {
         {/* Security */}
         <SectionTitle title="Security" />
 
-        <View style={styles.section}>
+        <View
+          style={[
+            styles.section,
+            {
+              backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+            },
+          ]}
+        >
           <MenuItem
             icon="key-outline"
             title="Change Password"
@@ -284,7 +305,14 @@ export default function ProfileScreen() {
         {/* Other */}
         <SectionTitle title="Other" />
 
-        <View style={styles.section}>
+        <View
+          style={[
+            styles.section,
+            {
+              backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
+            },
+          ]}
+        >
           <MenuItem
             icon="help-circle-outline"
             title="Help & Support"
@@ -363,7 +391,14 @@ function MenuItem({
   return (
     <Pressable style={styles.menuItem} onPress={onPress}>
       <View style={styles.menuLeft}>
-        <View style={styles.iconContainer}>
+        <View
+          style={[
+            styles.iconContainer,
+            {
+              backgroundColor: isDarkMode ? "#1F2937" : "#EFF6FF",
+            },
+          ]}
+        >
           <Ionicons name={icon} size={20} color="#2563EB" />
         </View>
 
@@ -379,7 +414,18 @@ function MenuItem({
             {title}
           </Text>
 
-          {value && <Text style={styles.menuValue}>{value}</Text>}
+          {value && (
+            <Text
+              style={[
+                styles.menuValue,
+                {
+                  color: isDarkMode ? "#9CA3AF" : "#64748B",
+                },
+              ]}
+            >
+              {value}
+            </Text>
+          )}
         </View>
       </View>
 
@@ -389,7 +435,16 @@ function MenuItem({
         <Ionicons name="chevron-forward" size={20} color="#94A3B8" />
       )}
 
-      {showDivider && <View style={styles.divider} />}
+      {showDivider && (
+        <View
+          style={[
+            styles.divider,
+            {
+              backgroundColor: isDarkMode ? "#374151" : "#F1F5F9",
+            },
+          ]}
+        />
+      )}
     </Pressable>
   );
 }
