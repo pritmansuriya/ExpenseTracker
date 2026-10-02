@@ -1,15 +1,16 @@
 import { useTheme } from "@/context/ThemeContext";
 import { addMoneyToGoal, getSavingsGoalById } from "@/services/savingsApi";
 import { addNotification } from "@/utils/notificationStorage";
+import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  Alert,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 type SavingsGoal = {
@@ -145,7 +146,8 @@ export default function AddMoneyScreen() {
     <View style={[styles.container, { backgroundColor: "transparent" }]}>
       {/* Header */}
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Text style={styles.backText}>← Back</Text>
+        <Ionicons name="arrow-back" size={20} color="#2563EB" />
+        <Text style={styles.backText}>Back</Text>
       </TouchableOpacity>
 
       <Text style={[styles.heading, { color: colors.text }]}>Add Money</Text>
@@ -159,7 +161,12 @@ export default function AddMoneyScreen() {
               { backgroundColor: colors.card, borderColor: colors.cardBorder },
             ]}
           >
-            <Text style={styles.goalIcon}>🎯</Text>
+            <Ionicons
+              name="flag-outline"
+              size={32}
+              color="#2563EB"
+              style={styles.goalIcon}
+            />
 
             <Text style={[styles.goalName, { color: colors.text }]}>
               {goal.name}
@@ -288,6 +295,9 @@ const styles = StyleSheet.create({
   },
 
   backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
     marginBottom: 20,
   },
 
@@ -317,8 +327,7 @@ const styles = StyleSheet.create({
   },
 
   goalIcon: {
-    fontSize: 32,
-    textAlign: "center",
+    alignSelf: "center",
     marginBottom: 8,
   },
 

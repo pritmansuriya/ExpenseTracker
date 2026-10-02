@@ -1,7 +1,7 @@
 import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router, useFocusEffect } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   Alert,
@@ -11,6 +11,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 
 const STORAGE_KEY = "transactions";
@@ -28,6 +29,9 @@ const DATE_FILTERS = [
   { label: "This Month", value: "month" },
 ];
 
+const getMonthKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
 type Transaction = {
   id: string;
   title: string;
@@ -42,6 +46,24 @@ type DateFilter = "all" | "today" | "week" | "month";
 
 export default function TransactionsScreen() {
   const { isDarkMode } = useTheme();
+  const { width } = useWindowDimensions();
+  const { category: categoryParam, month: monthParam } = useLocalSearchParams<{
+    category?: string;
+    month?: string;
+  }>();
+  const routeCategory = Array.isArray(categoryParam)
+    ? categoryParam[0]
+    : categoryParam;
+  const routeMonthValue = Array.isArray(monthParam)
+    ? monthParam[0]
+    : monthParam;
+  const routeMonth =
+    routeMonthValue && /^\d{4}-(0[1-9]|1[0-2])$/.test(routeMonthValue)
+      ? routeMonthValue
+      : null;
+  const drilldownCategory = routeCategory ?? null;
+  const drilldownMonth = routeMonth;
+  const compactHeader = width < 400;
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   // Filters
@@ -153,11 +175,16 @@ export default function TransactionsScreen() {
     const matchesType = filter === "all" || transaction.type === filter;
 
     // Category
-    const matchesCategory =
-      categoryFilter === "All" || transaction.category === categoryFilter;
+    const matchesCategory = drilldownCategory
+      ? transaction.category === drilldownCategory
+      : categoryFilter === "All" || transaction.category === categoryFilter;
 
     // Date
-    const matchesDate = matchesDateFilter(transaction.date);
+    const transactionDate = new Date(transaction.date);
+    const matchesDate = drilldownMonth
+      ? !Number.isNaN(transactionDate.getTime()) &&
+        getMonthKey(transactionDate) === drilldownMonth
+      : matchesDateFilter(transaction.date);
 
     return matchesSearch && matchesType && matchesCategory && matchesDate;
   });
@@ -168,13 +195,22 @@ export default function TransactionsScreen() {
     setFilter("all");
     setCategoryFilter("All");
     setDateFilter("all");
+    router.setParams({ category: undefined, month: undefined });
   };
 
   const hasActiveFilters =
     search.trim() !== "" ||
     filter !== "all" ||
     categoryFilter !== "All" ||
-    dateFilter !== "all";
+    dateFilter !== "all" ||
+    drilldownCategory !== null ||
+    drilldownMonth !== null;
+  const routeMonthLabel = drilldownMonth
+    ? new Date(`${drilldownMonth}-01T00:00:00`).toLocaleDateString("en-IN", {
+        month: "long",
+        year: "numeric",
+      })
+    : null;
 
   return (
     <ScrollView
@@ -206,24 +242,36 @@ export default function TransactionsScreen() {
         <View style={styles.headerButtons}>
           {/* Export Button */}
           <TouchableOpacity
-            style={styles.exportButton}
+            style={[
+              styles.exportButton,
+              compactHeader && styles.compactHeaderButton,
+            ]}
             onPress={() => router.push("/export-transaction")}
             activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel="Export transactions"
           >
             <Ionicons name="download-outline" size={19} color="#2563EB" />
 
-            <Text style={styles.exportButtonText}>Export</Text>
+            {!compactHeader && (
+              <Text style={styles.exportButtonText}>Export</Text>
+            )}
           </TouchableOpacity>
 
           {/* Add Button */}
           <TouchableOpacity
-            style={styles.addButton}
+            style={[
+              styles.addButton,
+              compactHeader && styles.compactHeaderButton,
+            ]}
             onPress={() => router.push("/add-transactions")}
             activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel="Add transaction"
           >
             <Ionicons name="add" size={20} color="#FFFFFF" />
 
-            <Text style={styles.addButtonText}>Add</Text>
+            {!compactHeader && <Text style={styles.addButtonText}>Add</Text>}
           </TouchableOpacity>
         </View>
       </View>
@@ -327,9 +375,14 @@ export default function TransactionsScreen() {
                 backgroundColor: isDarkMode ? "#1F2937" : "#FFFFFF",
                 borderColor: isDarkMode ? "#374151" : "#D1D5DB",
               },
-              categoryFilter === category && styles.activeCategoryButton,
+              (drilldownCategory
+                ? drilldownCategory === category
+                : categoryFilter === category) && styles.activeCategoryButton,
             ]}
-            onPress={() => setCategoryFilter(category)}
+            onPress={() => {
+              router.setParams({ category: undefined });
+              setCategoryFilter(category);
+            }}
           >
             <Text
               style={[
@@ -375,7 +428,10 @@ export default function TransactionsScreen() {
               },
               dateFilter === item.value && styles.activeDateButton,
             ]}
-            onPress={() => setDateFilter(item.value as DateFilter)}
+            onPress={() => {
+              router.setParams({ month: undefined });
+              setDateFilter(item.value as DateFilter);
+            }}
           >
             <Text
               style={[
@@ -397,15 +453,27 @@ export default function TransactionsScreen() {
       </ScrollView>
 
       <View style={styles.resultHeader}>
-        <Text
-          style={[
-            styles.resultText,
-            { color: isDarkMode ? "#D1D5DB" : "#6B7280" },
-          ]}
-        >
-          {filteredTransactions.length} transaction
-          {filteredTransactions.length !== 1 ? "s" : ""}
-        </Text>
+        <View>
+          <Text
+            style={[
+              styles.resultText,
+              { color: isDarkMode ? "#D1D5DB" : "#6B7280" },
+            ]}
+          >
+            {filteredTransactions.length} transaction
+            {filteredTransactions.length !== 1 ? "s" : ""}
+          </Text>
+          {(drilldownCategory || routeMonthLabel) && (
+            <Text
+              style={[
+                styles.drilldownLabel,
+                { color: isDarkMode ? "#9CA3AF" : "#6B7280" },
+              ]}
+            >
+              {[drilldownCategory, routeMonthLabel].filter(Boolean).join(" · ")}
+            </Text>
+          )}
+        </View>
 
         {hasActiveFilters && (
           <TouchableOpacity onPress={clearFilters}>
@@ -548,13 +616,14 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
+    gap: 10,
     marginBottom: 20,
   },
 
   headerTextContainer: {
     flex: 1,
-    marginRight: 12,
+    minWidth: 0,
   },
 
   heading: {
@@ -572,11 +641,20 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#2563EB",
     paddingHorizontal: 15,
     paddingVertical: 9,
     borderRadius: 10,
     gap: 6,
+  },
+
+  compactHeaderButton: {
+    width: 42,
+    height: 42,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    borderRadius: 8,
   },
 
   addButtonText: {
@@ -656,11 +734,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    flexShrink: 0,
   },
 
   exportButton: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#EFF6FF",
     borderWidth: 1,
     borderColor: "#BFDBFE",
@@ -734,6 +814,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#6B7280",
     fontWeight: "500",
+  },
+
+  drilldownLabel: {
+    fontSize: 12,
+    marginTop: 3,
   },
 
   clearText: {

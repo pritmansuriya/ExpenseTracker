@@ -1,4 +1,5 @@
 import { useTheme } from "@/context/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -40,7 +41,12 @@ export default function AppLockScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: "transparent" }]}>
-      <Text style={styles.icon}>🔒</Text>
+      <Ionicons
+        name="lock-closed-outline"
+        size={50}
+        color="#2563EB"
+        style={styles.icon}
+      />
 
       <Text
         style={[styles.title, { color: isDarkMode ? "#F9FAFB" : "#111827" }]}
@@ -111,8 +117,7 @@ const styles = StyleSheet.create({
   },
 
   icon: {
-    fontSize: 50,
-    textAlign: "center",
+    alignSelf: "center",
     marginBottom: 15,
   },
 

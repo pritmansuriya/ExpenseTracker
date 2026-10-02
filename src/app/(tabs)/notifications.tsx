@@ -3,20 +3,20 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-  Alert,
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    FlatList,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { Notification } from "@/types/notification";
 import {
-  clearAllNotifications,
-  deleteNotification,
-  getNotifications,
-  markNotificationAsRead,
+    clearAllNotifications,
+    deleteNotification,
+    getNotifications,
+    markNotificationAsRead,
 } from "@/utils/notificationStorage";
 
 export default function NotificationScreen() {
@@ -85,22 +85,24 @@ export default function NotificationScreen() {
     );
   };
 
-  const getIcon = (type: Notification["type"]) => {
+  const getIcon = (
+    type: Notification["type"],
+  ): { name: keyof typeof Ionicons.glyphMap; color: string } => {
     switch (type) {
       case "bill":
-        return "🔴";
+        return { name: "receipt-outline", color: "#DC2626" };
 
       case "budget":
-        return "🟡";
+        return { name: "wallet-outline", color: "#D97706" };
 
       case "saving":
-        return "🟢";
+        return { name: "trophy-outline", color: "#16A34A" };
 
       case "transaction":
-        return "🔵";
+        return { name: "swap-horizontal-outline", color: "#2563EB" };
 
       default:
-        return "🔔";
+        return { name: "notifications-outline", color: "#6B7280" };
     }
   };
 
@@ -127,7 +129,7 @@ export default function NotificationScreen() {
         activeOpacity={0.8}
       >
         <View style={styles.iconContainer}>
-          <Text style={styles.icon}>{getIcon(item.type)}</Text>
+          <Ionicons {...getIcon(item.type)} size={24} />
         </View>
 
         <View style={styles.content}>
@@ -308,10 +310,6 @@ const styles = StyleSheet.create({
     width: 40,
     alignItems: "center",
     marginTop: 2,
-  },
-
-  icon: {
-    fontSize: 24,
   },
 
   content: {

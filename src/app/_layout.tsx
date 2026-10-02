@@ -67,6 +67,69 @@ function AppNavigator() {
           }}
         />
 
+        <Stack.Screen
+          name="add-transactions"
+          options={{
+            title: "Add Transaction",
+          }}
+        />
+
+        <Stack.Screen
+          name="export-transaction"
+          options={{
+            title: "Export Transaction",
+          }}
+        />
+
+        <Stack.Screen
+          name="add-savings-goals"
+          options={{
+            title: "Add Goals",
+          }}
+        />
+
+        <Stack.Screen
+          name="add-money"
+          options={{
+            title: "Add Money",
+          }}
+        />
+
+        <Stack.Screen
+          name="edit-profile"
+          options={{
+            title: "Edit Profile",
+          }}
+        />
+
+        <Stack.Screen
+          name="change-password"
+          options={{
+            title: "Change Password",
+          }}
+        />
+
+        <Stack.Screen
+          name="help-support"
+          options={{
+            title: "Help & Support",
+          }}
+        />
+
+        <Stack.Screen
+          name="privacy-policy"
+          options={{
+            title: "Privacy Policy",
+          }}
+        />
+
+        <Stack.Screen
+          name="about-expense-tracker"
+          options={{
+            title: "About Expense Tracker",
+          }}
+        />
+
         {/* Accounts */}
         <Stack.Screen
           name="accounts"

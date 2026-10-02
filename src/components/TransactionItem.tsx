@@ -1,4 +1,5 @@
 import { useTheme } from "@/context/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Transaction = {
@@ -51,7 +52,13 @@ export default function TransactionItem({ transaction, onDelete }: Props) {
             { backgroundColor: isDarkMode ? "#0F172A" : "#F3F4F6" },
           ]}
         >
-          <Text style={styles.icon}>{isIncome ? "💰" : "💸"}</Text>
+          <Ionicons
+            name={
+              isIncome ? "arrow-down-circle-outline" : "arrow-up-circle-outline"
+            }
+            size={24}
+            color={isIncome ? "#16A34A" : "#DC2626"}
+          />
         </View>
 
         <View style={styles.info}>
@@ -141,10 +148,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
-  },
-
-  icon: {
-    fontSize: 22,
   },
 
   info: {

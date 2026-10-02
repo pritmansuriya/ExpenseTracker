@@ -1,18 +1,20 @@
 import { useTheme } from "@/context/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { Transaction } from "@/types/transaction";
-import { exportTrasnactionToCSV } from "@/utils/exportTransactions";
+import { exportTransactionsToExcel } from "@/utils/exportTransactionExcel";
+import { exportTransactionsToPDF } from "@/utils/exportTransactionPDF";
+import { exportTrasnactionToCSV } from "@/utils/exportTransactionsCSV";
 
 const STORAGE_KEY = "transactions";
 
@@ -64,6 +66,49 @@ export default function ExportTransactionScreen() {
     }
   };
 
+  const handlePDFExport = async () => {
+    if (transactions.length === 0) {
+      Alert.alert("No Transaction", "There are no tranaction to export.");
+      return;
+    }
+
+    try {
+      setExporting(true);
+
+      await exportTransactionsToPDF(transactions);
+    } catch (error) {
+      console.log("PDF export error:", error);
+
+      Alert.alert(
+        "Export Failed",
+        "Unable to export your transactions as PDF.",
+      );
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExcelExport = async () => {
+    if (transactions.length === 0) {
+      Alert.alert("No Transactons", "There are no transactions to export.");
+      return;
+    }
+    try {
+      setExporting(true);
+
+      await exportTransactionsToExcel(transactions);
+    } catch (error) {
+      console.log("Excel export error", error);
+
+      Alert.alert(
+        "Export Failed",
+        "Unable to export your transactions as Excel.",
+      );
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading) {
     return (
       <View
@@ -83,20 +128,6 @@ export default function ExportTransactionScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Text style={[styles.backText, { color: colors.text }]}>←</Text>
-        </TouchableOpacity>
-
-        <Text style={[styles.title, { color: colors.text }]}>
-          Export Tranasactions
-        </Text>
-
-        <View style={styles.headerSpace}></View>
-      </View>
       <View
         style={[
           styles.summaryCard,
@@ -135,7 +166,7 @@ export default function ExportTransactionScreen() {
         disabled={exporting}
       >
         <View style={styles.iconContainer}>
-          <Text style={styles.icon}>📊</Text>
+          <Ionicons name="stats-chart-outline" size={30} color="#2563EB" />
         </View>
 
         <View style={styles.optionContent}>
@@ -148,7 +179,82 @@ export default function ExportTransactionScreen() {
           </Text>
         </View>
 
-        <Text style={[styles.arrow, { color: colors.textSecondary }]}>→</Text>
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color={colors.textSecondary}
+        />
+      </TouchableOpacity>
+
+      {/* PDF */}
+
+      <TouchableOpacity
+        style={[
+          styles.exportCard,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
+        onPress={handlePDFExport}
+        disabled={exporting}
+      >
+        <View style={styles.iconContainer}>
+          <Ionicons name="document-text-outline" size={30} color="#2563EB" />
+        </View>
+
+        <View style={styles.optionContent}>
+          <Text style={[styles.optionTitle, { color: colors.text }]}>PDF</Text>
+
+          <Text
+            style={[styles.optionDescription, { color: colors.textSecondary }]}
+          >
+            Create a PDF report of your transactions
+          </Text>
+        </View>
+
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color={colors.textSecondary}
+        />
+      </TouchableOpacity>
+
+      {/* Excel */}
+
+      <TouchableOpacity
+        style={[
+          styles.exportCard,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+            marginTop: 12,
+          },
+        ]}
+        onPress={handleExcelExport}
+        disabled={exporting}
+      >
+        <View style={styles.iconContainer}>
+          <Ionicons name="grid-outline" size={30} color="#2563EB" />
+        </View>
+
+        <View style={styles.optionContent}>
+          <Text style={[styles.optionTitle, { color: colors.text }]}>
+            Excel
+          </Text>
+
+          <Text
+            style={[styles.optionDescription, { color: colors.textSecondary }]}
+          >
+            Export transactions to an Excel spreadsheet
+          </Text>
+        </View>
+
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color={colors.textSecondary}
+        />
       </TouchableOpacity>
 
       {/* Exporting */}
@@ -158,7 +264,7 @@ export default function ExportTransactionScreen() {
           <ActivityIndicator />
 
           <Text style={[styles.exportingText, { color: colors.textSecondary }]}>
-            Preparing your CSV file...
+            Preparing your file...
           </Text>
         </View>
       )}
@@ -250,10 +356,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  icon: {
-    fontSize: 30,
-  },
-
   optionContent: {
     flex: 1,
     marginLeft: 14,
@@ -268,11 +370,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 5,
     lineHeight: 19,
-  },
-
-  arrow: {
-    fontSize: 24,
-    marginLeft: 10,
   },
 
   exportingContainer: {

@@ -1,14 +1,15 @@
 import { useTheme } from "@/context/ThemeContext";
 import { deleteSavingsGoal, getSavingsGoals } from "@/services/savingsApi";
+import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 type SavingsGoal = {
@@ -95,13 +96,19 @@ export default function SavingsGoalScreen() {
           style={styles.createButton}
           onPress={() => router.push("/add-savings-goals")}
         >
-          <Text style={styles.createButtonText}>+ Create Goal</Text>
+          <Ionicons name="add" size={18} color="#FFFFFF" />
+          <Text style={styles.createButtonText}>Create Goal</Text>
         </TouchableOpacity>
       </View>
 
       {goals.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>🎯</Text>
+          <Ionicons
+            name="flag-outline"
+            size={55}
+            color={isDarkMode ? "#60A5FA" : "#2563EB"}
+            style={styles.emptyIcon}
+          />
 
           <Text
             style={[
@@ -163,7 +170,11 @@ export default function SavingsGoalScreen() {
                         { backgroundColor: isDarkMode ? "#0F172A" : "#EFF6FF" },
                       ]}
                     >
-                      <Text style={styles.icon}>🎯</Text>
+                      <Ionicons
+                        name="flag-outline"
+                        size={22}
+                        color={isDarkMode ? "#60A5FA" : "#2563EB"}
+                      />
                     </View>
 
                     <View style={styles.titleContainer}>
@@ -263,13 +274,18 @@ export default function SavingsGoalScreen() {
                       })
                     }
                   >
+                    <Ionicons
+                      name="add"
+                      size={18}
+                      color={isDarkMode ? "#BFDBFE" : "#2563EB"}
+                    />
                     <Text
                       style={[
                         styles.addMoneyText,
                         { color: isDarkMode ? "#BFDBFE" : "#2563EB" },
                       ]}
                     >
-                      + Add Money
+                      Add Money
                     </Text>
                   </TouchableOpacity>
                 )}
@@ -281,13 +297,18 @@ export default function SavingsGoalScreen() {
                       { backgroundColor: isDarkMode ? "#14532D" : "#DCFCE7" },
                     ]}
                   >
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={18}
+                      color={isDarkMode ? "#BBF7D0" : "#16A34A"}
+                    />
                     <Text
                       style={[
                         styles.completedText,
                         { color: isDarkMode ? "#BBF7D0" : "#16A34A" },
                       ]}
                     >
-                      🎉 Goal Completed!
+                      Goal Completed!
                     </Text>
                   </View>
                 )}
@@ -333,6 +354,9 @@ const styles = StyleSheet.create({
 
   createButton: {
     backgroundColor: "#2563EB",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 9,
@@ -379,10 +403,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
-  },
-
-  icon: {
-    fontSize: 22,
   },
 
   titleContainer: {
@@ -459,9 +479,12 @@ const styles = StyleSheet.create({
 
   addMoneyButton: {
     backgroundColor: "#EFF6FF",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 4,
     paddingVertical: 11,
     borderRadius: 9,
-    alignItems: "center",
     marginTop: 18,
   },
 
@@ -473,9 +496,12 @@ const styles = StyleSheet.create({
 
   completedBox: {
     backgroundColor: "#DCFCE7",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 7,
     paddingVertical: 11,
     borderRadius: 9,
-    alignItems: "center",
     marginTop: 18,
   },
 
@@ -490,7 +516,6 @@ const styles = StyleSheet.create({
   },
 
   emptyIcon: {
-    fontSize: 55,
     marginBottom: 15,
   },
 

@@ -77,23 +77,19 @@ export default function AboutExpenseTrackerScreen() {
             Built With
           </Text>
 
-          <Text style={[styles.tech, { color: colors.textSecondary }]}>
-            ⚛️ React Native
-          </Text>
-          <Text style={[styles.tech, { color: colors.textSecondary }]}>
-            📱 Expo
-          </Text>
-          <Text style={[styles.tech, { color: colors.textSecondary }]}>
-            🟦 TypeScript
-          </Text>
-          <Text style={[styles.tech, { color: colors.textSecondary }]}>
-            💾 AsyncStorage
-          </Text>
+          <Tech icon="code-slash-outline" label="React Native" />
+          <Tech icon="phone-portrait-outline" label="Expo" />
+          <Tech icon="code-slash-outline" label="TypeScript" />
+          <Tech icon="save-outline" label="AsyncStorage" />
         </View>
 
         <View style={styles.footer}>
           <Text style={[styles.footerText, { color: colors.textSecondary }]}>
-            Made with ❤️ for simple and better personal finance management.
+            Made with
+          </Text>
+          <Ionicons name="heart" size={15} color="#DC2626" />
+          <Text style={[styles.footerText, { color: colors.textSecondary }]}>
+            for simple and better personal finance management.
           </Text>
 
           <Text style={[styles.copyright, { color: colors.textSecondary }]}>
@@ -101,6 +97,25 @@ export default function AboutExpenseTrackerScreen() {
           </Text>
         </View>
       </ScrollView>
+    </View>
+  );
+}
+
+function Tech({
+  icon,
+  label,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+}) {
+  const { colors } = useTheme();
+
+  return (
+    <View style={styles.techRow}>
+      <Ionicons name={icon} size={18} color={colors.textSecondary} />
+      <Text style={[styles.tech, { color: colors.textSecondary }]}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -237,11 +252,21 @@ const styles = StyleSheet.create({
   tech: {
     fontSize: 15,
     color: "#4B5563",
+  },
+
+  techRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
     marginBottom: 12,
   },
 
   footer: {
     alignItems: "center",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 4,
     marginTop: 5,
   },
 

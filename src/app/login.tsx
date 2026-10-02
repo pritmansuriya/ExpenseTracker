@@ -1,4 +1,5 @@
 import { useTheme } from "@/context/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -62,7 +63,7 @@ export default function LoginScreen() {
           { backgroundColor: colors.card, borderColor: colors.cardBorder },
         ]}
       >
-        <Text style={styles.logo}>💰</Text>
+        <Ionicons name="wallet" size={50} color="#2563EB" style={styles.logo} />
 
         <Text style={[styles.title, { color: colors.text }]}>Welcome Back</Text>
 
@@ -150,8 +151,7 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    fontSize: 50,
-    textAlign: "center",
+    alignSelf: "center",
     marginBottom: 10,
   },
 
